@@ -1,0 +1,25 @@
+{
+  "name": "purescript-three",
+  "version": "0.0.0",
+  "homepage": "https://github.com/anthoq88/purescript-three",
+  "authors": [
+    "Anthony Quizon <anthoq88@gmail.com>"
+  ],
+  "description": "Purescript bindings for Threejs",
+  "main": "Three.purs",
+  "keywords": [
+    "Purescript",
+    "Three"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "threejs": "*"
+  }
+}
