@@ -21,5 +21,9 @@
   ],
   "dependencies": {
     "threejs": "*"
+  },
+  "devDependencies": {
+    "purescript-foreign": "~0.2.0",
+    "purescript-easy-ffi": "^1.0.0"
   }
 }
