@@ -1,0 +1,27 @@
+{
+  "name": "purescript-three",
+  "version": "1.0.0",
+  "description": "Purescript bindings for Three.js",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anthoq88/purescript-three.git"
+  },
+  "keywords": [
+    "Purescript",
+    "Three"
+  ],
+  "author": "Anthony Quizon",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/anthoq88/purescript-three/issues"
+  },
+  "homepage": "https://github.com/anthoq88/purescript-three",
+  "devDependencies": {
+    "gulp": "*",
+    "gulp-purescript": "*"
+  }
+}
