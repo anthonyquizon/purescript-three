@@ -22,6 +22,7 @@
   "homepage": "https://github.com/anthoq88/purescript-three",
   "devDependencies": {
     "gulp": "*",
-    "gulp-purescript": "*"
+    "gulp-purescript": "*",
+    "gulp-concat": "*"
   }
 }
