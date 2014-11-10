@@ -1,10 +1,10 @@
 module Graphics.Three.Mesh where
 
-import Control.Monad.Eff
-import Data.Function
-import Graphics.Three.Geometry
-import Graphics.Three.Material
-import Graphics.Three.Util
+import           Control.Monad.Eff
+import           Data.Function
+import qualified Graphics.Three.Geometry as Geo
+import qualified Graphics.Three.Material as Mat
+import           Graphics.Three.Util
 
 foreign import data Mesh :: *
 
@@ -16,5 +16,5 @@ foreign import create """
             };
         };
     }
-    """ :: forall eff. Geometry -> Material -> Eff (three :: Three | eff) Mesh
+    """ :: forall eff. Geo.Geometry -> Mat.Material -> Eff (three :: Three | eff) Mesh
 

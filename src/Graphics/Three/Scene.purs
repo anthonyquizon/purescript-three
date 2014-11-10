@@ -1,9 +1,10 @@
 module Graphics.Three.Scene where
 
-import Control.Monad.Eff
-import Data.Function
-import Graphics.Three.Util
-import Graphics.Three.Camera
+import           Control.Monad.Eff
+import           Data.Function
+import qualified Graphics.Three.Camera as Cam --TODO should use import .. (Camera)
+import qualified Graphics.Three.Mesh as Me -- TODO should use import .. (Mesh)
+import           Graphics.Three.Util
 
 foreign import data Scene :: *
 
@@ -24,5 +25,9 @@ foreign import add """
     }
     """ :: forall eff a. Scene -> a -> Eff (three :: Three | eff) Unit
 
-addCamera :: forall eff. Scene -> Camera -> Eff (three :: Three | eff) Unit
+addCamera :: forall eff. Scene -> Cam.Camera -> Eff (three :: Three | eff) Unit
 addCamera = add
+
+addMesh :: forall eff. Scene -> Me.Mesh -> Eff (three :: Three | eff) Unit
+addMesh = add
+

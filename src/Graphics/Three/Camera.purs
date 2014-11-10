@@ -45,7 +45,9 @@ foreign import createPerspective """
 foreign import posX """
     function posX(camera) {
         return function(x) {
-            camera.position.x = x;
+            return function() {
+                camera.position.x = x;
+            };
         };
     }
     """ :: forall eff. Camera -> Number -> Eff (three :: Three | eff) Unit
@@ -53,7 +55,9 @@ foreign import posX """
 foreign import posY """
     function posY(camera) {
         return function(y) {
-            camera.position.y = y;
+            return function() {
+                camera.position.y = y;
+            };
         };
     }
     """ :: forall eff. Camera -> Number -> Eff (three :: Three | eff) Unit
@@ -61,7 +65,9 @@ foreign import posY """
 foreign import posZ """
     function posZ(camera) {
         return function(z) {
-            camera.position.z = z;
+            return function() {
+                camera.position.z = z;
+            };
         };
     }
     """ :: forall eff. Camera -> Number -> Eff (three :: Three | eff) Unit
