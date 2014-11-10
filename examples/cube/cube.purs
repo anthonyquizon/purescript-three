@@ -16,5 +16,8 @@ main = do
 
     sceneAddCamera scene camera
 
+    rendererSetSize renderer width height
+    appendRendererByID renderer "container"
+
     return Unit
 
