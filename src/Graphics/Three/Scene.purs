@@ -17,12 +17,14 @@ foreign import createScene """
 foreign import sceneAdd """
     function sceneAdd(scene) {
         return function(a) {
-            scene.add(a);
-        }
+            return function() {
+                scene.add(a);
+            };
+        };
     }
     """ :: forall eff a. Scene -> a -> Eff (three :: Three | eff) Unit
 
-addCamera :: forall eff. Scene -> Camera -> Eff (three :: Three | eff) Unit
-addCamera = sceneAdd
+sceneAddCamera :: forall eff. Scene -> Camera -> Eff (three :: Three | eff) Unit
+sceneAddCamera = sceneAdd
 
 

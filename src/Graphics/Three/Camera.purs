@@ -6,30 +6,64 @@ import Graphics.Three.Util
 
 foreign import data Camera :: *
 
-foreign import createCamera """
-    function createCamera(left, right, top, bottom, near, far) {
-        new THREE.OrthographicCamera(left, right, top, bottom, near, far);
+foreign import createOrthogonalCamera """
+    function createOrthogonalCamera(left) {
+        return function(right) {
+            return function(top) {
+                return function(bottom) {
+                    return function(near) {
+                        return function(far) {
+                            return function() {
+                                return new THREE.OrthographicCamera(left, right, top, bottom, near, far);
+                            };
+                        };
+                    };
+                };
+            };
+        };
     }
-    """ :: forall eff. Fn6 Number Number Number 
-                           Number Number Number 
-                           (Eff (three :: Three | eff) Camera)
+    """ :: forall eff. Number -> Number -> Number -> 
+                       Number -> Number -> Number ->
+                       Eff (three :: Three | eff) Camera
+
+foreign import createPerspectiveCamera """
+    function createPerspectiveCamera(fov) {
+        return function(aspect) {
+            return function(near) {
+                return function(far) {
+                    return function() {
+                        return new THREE.PerspectiveCamera(fov, aspect, near, far);
+                    };
+                };
+            };
+        };
+    }
+    """ :: forall eff. Number -> Number -> 
+                       Number -> Number -> 
+                       Eff (three :: Three | eff) Camera
 
 foreign import cameraPosX """
-    function cameraPos(camera, x) {
-        camera.position.x = x;
+    function cameraPosX(camera) {
+        return function(x) {
+            camera.position.x = x;
+        };
     }
-    """ :: forall eff. Fn2 Camera Number (Eff (three :: Three | eff) Unit)
+    """ :: forall eff. Camera -> Number -> Eff (three :: Three | eff) Unit
 
 foreign import cameraPosY """
-    function cameraPos(camera, y) {
-        camera.position.y = y;
+    function cameraPosY(camera) {
+        return function(y) {
+            camera.position.y = y;
+        };
     }
-    """ :: forall eff. Fn2 Camera Number (Eff (three :: Three | eff) Unit)
-
+    """ :: forall eff. Camera -> Number -> Eff (three :: Three | eff) Unit
 
 foreign import cameraPosZ """
-    function cameraPos(camera, z) {
-        camera.position.z = z;
+    function cameraPosZ(camera) {
+        return function(z) {
+            camera.position.z = z;
+        };
     }
-    """ :: forall eff. Fn2 Camera Number (Eff (three :: Three | eff) Unit)
+    """ :: forall eff. Camera -> Number -> Eff (three :: Three | eff) Unit
+
 

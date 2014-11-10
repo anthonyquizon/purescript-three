@@ -9,7 +9,7 @@ foreign import data Geometry :: *
 
 
 foreign import createBoxGeometry """
-    function createMeshBasicMaterial(x) {
+    function createBoxGeometry(x) {
         return function(y) {
             return function(z) {
                 return function() {
