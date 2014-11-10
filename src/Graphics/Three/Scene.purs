@@ -11,16 +11,18 @@ foreign import createScene """
     function createScene() {
         return new THREE.Scene();
     }
-    """ :: forall eff. Eff (three :: Three) Scene
+    """ :: forall eff. Eff (three :: Three | eff) Scene
 
 --TODO do note expose?
 foreign import sceneAdd """
-    function sceneAdd(scene, a) {
-        scene.add(a);
+    function sceneAdd(scene) {
+        return function(a) {
+            scene.add(a);
+        }
     }
-    """ :: forall eff a. Scene -> a -> Eff (three :: Three) Unit
+    """ :: forall eff a. Scene -> a -> Eff (three :: Three | eff) Unit
 
-addCamera :: forall eff. Scene -> Camera -> Eff (three :: Three) Unit
+addCamera :: forall eff. Scene -> Camera -> Eff (three :: Three | eff) Unit
 addCamera = sceneAdd
 
 

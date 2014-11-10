@@ -11,18 +11,20 @@ foreign import createWebGLRenderer """
     function createWebGLRenderer() {
         return new THREE.WebGLRenderer();
     }
-    """ :: forall eff. Eff (three :: Three) Renderer
+    """ :: forall eff. Eff (three :: Three | eff) Renderer
 
 foreign import rendererSetSize """
     function rendererSetSize(renderer, width, height) {
         renderer.setSize(width, height);
     }
-    """ :: forall eff. Fn3 Renderer Number Number (Eff (three :: Three) Unit)
+    """ :: forall eff. Fn3 Renderer Number Number (Eff (three :: Three | eff) Unit)
 
 foreign import rendererDomElement """
     function rendererDomElement(renderer) {
-        return renderer.domElement();
+        return function() {
+            return renderer.domElement();
+        };
     }
-    """ :: forall eff. Eff (three :: Three, dom :: DOM) Node
+    """ :: forall eff. Renderer -> Eff (three :: Three, dom :: DOM | eff) Node
 
 

@@ -12,7 +12,24 @@ foreign import createCamera """
     }
     """ :: forall eff. Fn6 Number Number Number 
                            Number Number Number 
-                           (Eff (three :: Three) Camera)
+                           (Eff (three :: Three | eff) Camera)
+
+foreign import cameraPosX """
+    function cameraPos(camera, x) {
+        camera.position.x = x;
+    }
+    """ :: forall eff. Fn2 Camera Number (Eff (three :: Three | eff) Unit)
+
+foreign import cameraPosY """
+    function cameraPos(camera, y) {
+        camera.position.y = y;
+    }
+    """ :: forall eff. Fn2 Camera Number (Eff (three :: Three | eff) Unit)
 
 
+foreign import cameraPosZ """
+    function cameraPos(camera, z) {
+        camera.position.z = z;
+    }
+    """ :: forall eff. Fn2 Camera Number (Eff (three :: Three | eff) Unit)
 
