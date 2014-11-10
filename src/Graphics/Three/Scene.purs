@@ -7,15 +7,15 @@ import Graphics.Three.Camera
 
 foreign import data Scene :: *
 
-foreign import createScene """
-    function createScene() {
+foreign import create """
+    function create() {
         return new THREE.Scene();
     }
     """ :: forall eff. Eff (three :: Three | eff) Scene
 
 --TODO do note expose?
-foreign import sceneAdd """
-    function sceneAdd(scene) {
+foreign import add """
+    function add(scene) {
         return function(a) {
             return function() {
                 scene.add(a);
@@ -24,7 +24,5 @@ foreign import sceneAdd """
     }
     """ :: forall eff a. Scene -> a -> Eff (three :: Three | eff) Unit
 
-sceneAddCamera :: forall eff. Scene -> Camera -> Eff (three :: Three | eff) Unit
-sceneAddCamera = sceneAdd
-
-
+addCamera :: forall eff. Scene -> Camera -> Eff (three :: Three | eff) Unit
+addCamera = add

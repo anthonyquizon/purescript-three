@@ -8,8 +8,8 @@ import Graphics.Three.Util
 
 foreign import data Mesh :: *
 
-foreign import createMesh """
-    function createMesh (geometry) {
+foreign import create """
+    function create (geometry) {
         return function(material) {
             return function() {
                 return new THREE.Mesh(geometry, material);

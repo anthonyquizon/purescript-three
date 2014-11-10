@@ -7,14 +7,14 @@ import Graphics.Three.Util
 
 foreign import data Renderer :: *
 
-foreign import createWebGLRenderer """
-    function createWebGLRenderer() {
+foreign import createWebGL """
+    function createWebGL() {
         return new THREE.WebGLRenderer();
     }
     """ :: forall eff. Eff (three :: Three | eff) Renderer
 
-foreign import rendererSetSize """
-    function rendererSetSize(renderer) {
+foreign import setSize """
+    function setSize(renderer) {
         return function(width) {
             return function(height) {
                 return function () {
@@ -25,16 +25,16 @@ foreign import rendererSetSize """
     }
     """ :: forall eff. Renderer -> Number -> Number -> Eff (three :: Three | eff) Unit
 
-foreign import rendererDomElement """
-    function rendererDomElement(renderer) {
+foreign import domElement """
+    function domElement(renderer) {
         return function() {
             return renderer.domElement;
         };
     }
     """ :: forall eff. Renderer -> Eff (three :: Three, dom :: DOM | eff) Node
 
-foreign import appendRendererByID """
-    function appendRendererByID(renderer) {
+foreign import appendToDomByID """
+    function appendToDomByID(renderer) {
         return function rendererDomElement(idStr) {
             return function() {
                 document.getElementById(idStr)

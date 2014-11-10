@@ -1,10 +1,9 @@
 module Graphics.Three where
 
-import Graphics.Three.Camera
-import Graphics.Three.Renderer
-import Graphics.Three.Scene
-import Graphics.Three.Mesh
-import Graphics.Three.Material
-import Graphics.Three.Geometry
-
-import Graphics.Three.Util
+import qualified Graphics.Three.Camera   as Camera
+import qualified Graphics.Three.Renderer as Renderer
+import qualified Graphics.Three.Scene    as Scene
+import qualified Graphics.Three.Mesh     as Mesh
+import qualified Graphics.Three.Material as Material
+import qualified Graphics.Three.Geometry as Geometry
+import qualified Graphics.Three.Util     as Util

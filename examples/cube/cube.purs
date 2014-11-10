@@ -1,23 +1,24 @@
 module Examples.Cube where
 
+import qualified Graphics.Three.Renderer as Renderer
+import qualified Graphics.Three.Scene    as Scene
+import qualified Graphics.Three.Camera   as Camera
+
 import Debug.Trace
-import Graphics.Three.Renderer
-import Graphics.Three.Scene
-import Graphics.Three.Camera
 
 
 width = 400
 height = 500
 
 main = do
-    renderer <- createWebGLRenderer
-    scene <- createScene
-    camera <- createPerspectiveCamera 45 (width/height) 1 1000
+    renderer <- Renderer.createWebGL
+    scene <- Scene.create
+    camera <- Camera.createPerspective 45 (width/height) 1 1000
 
-    sceneAddCamera scene camera
+    Scene.addCamera scene camera
 
-    rendererSetSize renderer width height
-    appendRendererByID renderer "container"
+    Renderer.setSize renderer width height
+    Renderer.appendToDomByID renderer "container"
 
     return Unit
 

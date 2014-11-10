@@ -6,8 +6,8 @@ import Graphics.Three.Util
 
 foreign import data Camera :: *
 
-foreign import createOrthogonalCamera """
-    function createOrthogonalCamera(left) {
+foreign import createOrthogonal """
+    function createOrthogonal(left) {
         return function(right) {
             return function(top) {
                 return function(bottom) {
@@ -26,8 +26,8 @@ foreign import createOrthogonalCamera """
                        Number -> Number -> Number ->
                        Eff (three :: Three | eff) Camera
 
-foreign import createPerspectiveCamera """
-    function createPerspectiveCamera(fov) {
+foreign import createPerspective """
+    function createPerspective(fov) {
         return function(aspect) {
             return function(near) {
                 return function(far) {
@@ -42,28 +42,27 @@ foreign import createPerspectiveCamera """
                        Number -> Number -> 
                        Eff (three :: Three | eff) Camera
 
-foreign import cameraPosX """
-    function cameraPosX(camera) {
+foreign import posX """
+    function posX(camera) {
         return function(x) {
             camera.position.x = x;
         };
     }
     """ :: forall eff. Camera -> Number -> Eff (three :: Three | eff) Unit
 
-foreign import cameraPosY """
-    function cameraPosY(camera) {
+foreign import posY """
+    function posY(camera) {
         return function(y) {
             camera.position.y = y;
         };
     }
     """ :: forall eff. Camera -> Number -> Eff (three :: Three | eff) Unit
 
-foreign import cameraPosZ """
-    function cameraPosZ(camera) {
+foreign import posZ """
+    function posZ(camera) {
         return function(z) {
             camera.position.z = z;
         };
     }
     """ :: forall eff. Camera -> Number -> Eff (three :: Three | eff) Unit
-
 

@@ -8,8 +8,8 @@ import Graphics.Three.Util
 foreign import data Geometry :: *
 
 
-foreign import createBoxGeometry """
-    function createBoxGeometry(x) {
+foreign import createBox """
+    function createBox(x) {
         return function(y) {
             return function(z) {
                 return function() {
