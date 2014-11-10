@@ -7,7 +7,7 @@ import Graphics.Three.Util
 foreign import data Camera :: *
 
 foreign import createCamera """
-    function (left, right, top, bottom, near, far) {
+    function createCamera(left, right, top, bottom, near, far) {
         new THREE.OrthographicCamera(left, right, top, bottom, near, far);
     }
     """ :: forall eff. Fn6 Number Number Number 

@@ -2,41 +2,66 @@
 
 var gulp      	= require('gulp')
   , purescript 	= require('gulp-purescript')
-  , concat      = require('gulp-concat')
+  , connect     = require('gulp-connect')
 
-var paths = {
-	src: 'src/**/*.purs',
-	dest: 'build/output',
-	bowerSrc: [
-	  'bower_components/purescript-*/src/**/*.purs'
-	],
-	manualReadme: 'docsrc/README.md',
-	apiDest: 'build/API.md',
-	readmeDest: 'README.md'
+
+var bower_src = [
+    'bower_components/purescript-*/src/**/*.purs'
+];
+
+var library = {
+    src: ['src/**/*.purs'],
+    dest: 'build/output',
+    options : {}
 };
 
-gulp.task('compile', function() {
-	var psc = purescript.pscMake({
-		// Compiler options
-		output: paths.dest
-	});
+var examples = {
+    cube : {
+        src : ['examples/cube/cube.purs'],
+        dest: 'examples/cube/',
+        options : {
+            output: 'cube.js',
+            main: 'Examples.Cube'
+        }
+    }
+};
+
+function compile(src, dest, options) {
+	var psc = purescript.psc(options);
 
 	psc.on('error', function(e) {
 		console.error(e.message);
 		psc.end();
 	});
-    
-	return gulp.src([paths.src]
-               .concat(paths.bowerSrc))
+
+	return gulp.src(src.concat(bower_src))
                .pipe(psc)
+               .pipe(gulp.dest(dest));
+}
+
+gulp.task('build', function() {
+    compile(library.src, library.dest, library.options);
+    //TODO PSCI
+});
+
+gulp.task('examples', function() {
+    var cube_src = library.src.concat(examples.cube.src);
+
+    compile(
+        cube_src, 
+        examples.cube.dest, 
+        examples.cube.options
+    );
+
+    connect.server({
+        root: 'examples'
+    });
 });
 
 gulp.task('watch', ['build'], function() {
-	gulp.watch(paths.src, ['build']);
-	//gulp.watch(paths.manualReadme, ['concatDocs']);
+	gulp.watch(library.src, ['build']);
+    //TODO build docs
 });
-
-gulp.task('build', ['compile']);
 
 gulp.task('default', ['build']);
 
