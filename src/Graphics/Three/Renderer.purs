@@ -5,6 +5,7 @@ import           DOM
 import           Data.Function
 import qualified Graphics.Three.Camera as Cam
 import qualified Graphics.Three.Scene as Sce
+import           Graphics.Three.Types
 import           Graphics.Three.Util
 
 foreign import data Renderer :: *
