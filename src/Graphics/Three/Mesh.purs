@@ -9,15 +9,8 @@ import           Graphics.Three.Util
 
 foreign import data Mesh :: *
 
-foreign import create """
-    function create (geometry) {
-        return function(material) {
-            return function() {
-                return new THREE.Mesh(geometry, material);
-            };
-        };
-    }
-    """ :: forall eff. Geo.Geometry -> Mat.Material -> Eff (three :: Three | eff) Mesh
+create :: forall eff. Geo.Geometry -> Mat.Material -> Eff (three :: Three | eff) Mesh
+create = ffi ["geometry", "material", ""] "new THREE.Mesh(geometry, material);"
 
 rotateIncrement :: forall eff. Mesh -> Number -> Number -> Number -> Eff (three :: Three | eff) Unit
 rotateIncrement = ffi ["mesh", "x", "y", "z"]

@@ -7,16 +7,6 @@ import           Graphics.Three.Util
 
 foreign import data Geometry :: *
 
-
-foreign import createBox """
-    function createBox(x) {
-        return function(y) {
-            return function(z) {
-                return function() {
-                    return new THREE.BoxGeometry(x, y, z);
-                }
-            }
-        }
-    }
-    """ :: forall eff. Number -> Number -> Number -> Eff (three :: Three | eff) Geometry
+createBox :: forall eff. Number -> Number -> Number -> Eff (three :: Three | eff) Geometry
+createBox = ffi ["x", "y", "z", ""] "new THREE.BoxGeometry(x, y, z)"
 

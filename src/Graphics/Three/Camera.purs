@@ -10,20 +10,14 @@ foreign import data Camera :: *
 createOrthogonal :: forall eff. Number -> Number -> Number -> 
                        Number -> Number -> Number ->
                        Eff (three :: Three | eff) Camera
-createOrthogonal = ffi ["left", "right", "top", "bottom", "near", "far"] 
-    """ function() {
-        return new THREE.OrthographicCamera(left, right, top, bottom, near, far);
-    };
-    """
+createOrthogonal = ffi ["left", "right", "top", "bottom", "near", "far", ""] 
+    "new THREE.OrthographicCamera(left, right, top, bottom, near, far)"
 
 createPerspective :: forall eff. Number -> Number -> 
                        Number -> Number -> 
                        Eff (three :: Three | eff) Camera
-createPerspective = ffi ["fov", "aspect", "near", "far"] 
-    """ function() {
-        return new THREE.PerspectiveCamera(fov, aspect, near, far);
-    };
-    """
+createPerspective = ffi ["fov", "aspect", "near", "far", ""]
+    "new THREE.PerspectiveCamera(fov, aspect, near, far)"
 
 foreign import posX """
     function posX(camera) {

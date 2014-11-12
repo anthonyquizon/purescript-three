@@ -9,22 +9,11 @@ import           Graphics.Three.Util
 
 foreign import data Scene :: *
 
-foreign import create """
-    function create() {
-        return new THREE.Scene();
-    }
-    """ :: forall eff. Eff (three :: Three | eff) Scene
+create :: forall eff. Eff (three :: Three | eff) Scene
+create = ffi [""] "new THREE.Scene()"
 
---TODO do note expose?
-foreign import add """
-    function add(scene) {
-        return function(a) {
-            return function() {
-                scene.add(a);
-            };
-        };
-    }
-    """ :: forall eff a. Scene -> a -> Eff (three :: Three | eff) Unit
+add :: forall eff a. Scene -> a -> Eff (three :: Three | eff) Unit
+add = fpi ["scene", "a", ""] "scene.add(a)"
 
 addCamera :: forall eff. Scene -> Cam.Camera -> Eff (three :: Three | eff) Unit
 addCamera = add

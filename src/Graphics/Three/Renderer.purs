@@ -10,52 +10,21 @@ import           Graphics.Three.Util
 
 foreign import data Renderer :: *
 
-foreign import createWebGL """
-    function createWebGL() {
-        return new THREE.WebGLRenderer();
-    }
-    """ :: forall eff. Eff (three :: Three | eff) Renderer
+createWebGL:: forall eff opts. {|opts} -> Eff (three :: Three | eff) Renderer
+createWebGL = ffi ["params", ""] "new THREE.WebGLRenderer(params)"
 
-foreign import setSize """
-    function setSize(renderer) {
-        return function(width) {
-            return function(height) {
-                return function () {
-                    renderer.setSize(width, height);
-                };
-            };
-        };
-    }
-    """ :: forall eff. Renderer -> Number -> Number -> Eff (three :: Three | eff) Unit
+setSize :: forall eff. Renderer -> Number -> Number -> Eff (three :: Three | eff) Unit
+setSize = ffi ["renderer", "width", "height", ""] "renderer.setSize(width, height)"
 
-foreign import render """
-    function render(renderer) {
-        return function(scene) {
-            return function(camera) {
-                return function() {
-                    return renderer.render(scene, camera);
-                };
-            };
-        };
-    }
-    """ :: forall eff. Renderer -> Sce.Scene -> Cam.Camera -> Eff (three :: Three | eff) Unit
+render :: forall eff. Renderer -> Sce.Scene -> Cam.Camera -> Eff (three :: Three | eff) Unit
+render = fpi ["renderer", "scene", "camera", ""] "renderer.render(scene, camera)"
 
-foreign import domElement """
-    function domElement(renderer) {
-        return function() {
-            return renderer.domElement;
-        };
-    }
-    """ :: forall eff. Renderer -> Eff (three :: Three, dom :: DOM | eff) Node
+domElement :: forall eff. Renderer -> Eff (three :: Three, dom :: DOM | eff) Node
+domElement = ffi ["renderer"] "renderer.domElement"
 
-foreign import appendToDomByID """
-    function appendToDomByID(renderer) {
-        return function rendererDomElement(idStr) {
-            return function() {
-                document.getElementById(idStr)
-                        .appendChild(renderer.domElement);
-            };
-        };
-    }
-    """ :: forall eff. Renderer -> String -> Eff (three :: Three, dom :: DOM | eff) Unit
+appendToDomByID :: forall eff. Renderer -> String -> Eff (three :: Three, dom :: DOM | eff) Unit
+appendToDomByID = fpi ["renderer", "idStr", ""] 
+    """ document.getElementById(idStr)
+                .appendChild(renderer.domElement);
+    """
 

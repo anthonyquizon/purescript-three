@@ -7,18 +7,10 @@ import Graphics.Three.Util
 
 foreign import data Material :: *
 
+create :: forall eff opt. {|opt} ->Eff (three :: Three | eff) Material
+create = ffi ["param", ""] "new THREE.Material(param)"
 
---TODO material properties
-foreign import create """
-    function create() {
-        return new THREE.Material();
-    }
-    """ :: forall eff. Eff (three :: Three | eff) Material
+createMeshBasic :: forall eff opt. {|opt} -> Eff (three :: Three | eff) Material
+createMeshBasic = ffi ["param", ""] "new THREE.MeshBasicMaterial(param)"
 
---TODO material properties
-foreign import createMeshBasic """
-    function createMeshBasic() {
-        return new THREE.MeshBasicMaterial();
-    }
-    """ :: forall eff. Eff (three :: Three | eff) Material
 

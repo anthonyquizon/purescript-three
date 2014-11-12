@@ -31,10 +31,10 @@ rotateCube renderer scene camera mesh n = do
     Renderer.render renderer scene camera
 
 main = do
-    renderer <- Renderer.createWebGL
+    renderer <- Renderer.createWebGL {antialias: true}
     scene    <- Scene.create
     camera   <- Camera.createPerspective 45 (width/height) 1 1000
-    material <- Material.createMeshBasic
+    material <- Material.createMeshBasic {}
     box      <- Geometry.createBox 100 100 100
     cube     <- Mesh.create box material
 
