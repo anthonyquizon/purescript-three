@@ -3,6 +3,7 @@
 var gulp      	= require('gulp')
   , purescript 	= require('gulp-purescript')
   , connect     = require('gulp-connect')
+  , fs          = require('fs')
 
 
 var bower_src = [
@@ -15,16 +16,6 @@ var library = {
     options : {}
 };
 
-var examples = {
-    cube : {
-        src : ['examples/cube/cube.purs'],
-        dest: 'examples/cube/',
-        options : {
-            output: 'cube.js',
-            main: 'Examples.Cube'
-        }
-    }
-};
 
 function compile(src, dest, options) {
 	var psc = purescript.psc(options);
@@ -45,13 +36,24 @@ gulp.task('build', function() {
 });
 
 gulp.task('examples', function() {
-    var cube_src = library.src.concat(examples.cube.src);
+    var dirs = fs.readdirSync('examples');
+   
+    for (var i=0; i<dirs.length; i++) {
 
-    compile(
-        cube_src, 
-        examples.cube.dest, 
-        examples.cube.options
-    );
+        if (dirs[i] == "bower_components") {
+            continue;
+        }
+        var dir  = 'examples/' + dirs[i] + '/'
+          , src  = library.src.concat(dir + '*.purs')
+          , dest = dir + 'output/'
+          , opts = {
+                output: 'main.js', 
+                main: true
+            }
+
+
+        compile(src, dest, opts);
+    }
 
     connect.server({
         root: 'examples'
