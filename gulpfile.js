@@ -30,9 +30,20 @@ function compile(src, dest, options) {
                .pipe(gulp.dest(dest));
 }
 
+gulp.task('dotPsci', function() {
+    var psci = purescript.dotPsci();
+
+	psci.on('error', function(e) {
+		console.error(e.message);
+		psci.end();
+	});
+
+	return gulp.src(library.src.concat(bower_src))
+               .pipe(psci);
+});
+
 gulp.task('build', function() {
     compile(library.src, library.dest, library.options);
-    //TODO PSCI
 });
 
 gulp.task('examples', function() {
@@ -61,9 +72,9 @@ gulp.task('examples', function() {
 });
 
 gulp.task('watch', ['build'], function() {
-	gulp.watch(library.src, ['build']);
+	gulp.watch(library.src, ['build', 'dotPsci']);
     //TODO build docs
 });
 
-gulp.task('default', ['build']);
+gulp.task('default', ['build', 'dotPsci']);
 
