@@ -1,6 +1,7 @@
 module Main where
 
 import           Control.Monad.Eff
+import           Control.Monad.Eff.Ref
 import           DOM
 import qualified Graphics.Three.Renderer as Renderer
 import qualified Graphics.Three.Scene    as Scene
@@ -14,13 +15,41 @@ import qualified Math           as Math
 import Debug.Trace
 
 
-data Shape = Shape {
-          mesh :: Mesh.Mesh
-    }
-
 width    = 500
 height   = 500
-interval = 20
+interval = 200
+radius   = 50.0
+
+
+newtype Context = Context {
+          renderer :: Renderer.Renderer 
+        , scene    :: Scene.Scene
+        , camera   :: Camera.Camera
+        , mesh     :: Mesh.Mesh
+        , material :: Material.Material
+    }
+
+context :: Renderer.Renderer -> Scene.Scene -> 
+           Camera.Camera     -> Mesh.Mesh   -> 
+           Material.Material -> Context
+context r s c me ma = Context {
+          renderer: r
+        , scene:    s
+        , camera:   c
+        , mesh:     me
+        , material: ma
+    }
+
+initUniforms = {
+        amount: {
+             "type" : "f"
+            , value : 0.0
+        },
+        radius: {
+             "type" : "f"
+            , value : radius
+        }
+    }
 
 vertexShader :: String
 vertexShader = """
@@ -28,8 +57,29 @@ vertexShader = """
     precision highp float;
     #endif
 
+    uniform float amount;
+    uniform float radius;
+
+    float morph(in float p) {
+        float eps = 0.1;
+
+        if (p < -eps) {
+           return mix(p, -radius, amount); //TODO uniform width
+        }
+        if (p > eps) {
+           return mix(p, radius, amount);
+        }
+
+        return 0.0;
+    }
+
     void main() {
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+        vec3 pos = position;
+
+        pos.x = morph(pos.x);
+        pos.y = morph(pos.y);
+        
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
     }
 """
 
@@ -40,9 +90,21 @@ fragmentShader = """
     #endif
 
     void main() {
-        gl_FragColor = vec4(1.0,0.0,1.0,1.0);
+        gl_FragColor = vec4(1.0,0.0,0.0,1.0);
     }
 """
+
+clamp :: Number -> Number
+clamp n = Math.min 1.0 $ Math.max (0.0) n
+
+morphShape :: forall eff. Material.Material -> Number -> Eff (trace :: Trace, three :: Three | eff) Unit
+morphShape ma n = do
+    let a = (Math.sin $ ((2*Math.pi) / interval) * (n % interval)) * 0.5 + 0.5
+    
+    Material.setUniform ma "amount" $ clamp a
+    print a
+
+    return unit
 
 
 doAnimation :: forall eff. Eff (three :: Three | eff) Unit -> Eff (three :: Three | eff) Unit
@@ -50,32 +112,28 @@ doAnimation animate = do
     animate
     requestAnimationFrame $ doAnimation animate
 
-rotateCube :: forall eff. Renderer.Renderer -> 
-                          Scene.Scene -> 
-                          Camera.Camera -> 
-                          Mesh.Mesh -> 
-                          Number -> 
-                          Eff (three :: Three | eff) Unit
-rotateCube renderer scene camera mesh n = do
-    --modulo 60
-    --timing
-    Renderer.render renderer scene camera
+renderContext :: forall a eff. RefVal Number -> Context -> 
+                       Eff ( trace :: Trace, ref :: Ref, three :: Three | eff) Unit
+renderContext frame (Context c) = do
+    
+    modifyRef frame $ \f -> f + 1
+    f <- readRef frame
 
-{--circleMorphSquare :: forall eff. Shape -> Eff (three :: Three | eff) Unit
-circleMorphSquare circle fac = do
-    -- get fraction
-    return Unit
---}
+    morphShape c.material f
+
+    Renderer.render c.renderer c.scene c.camera
 
 main = do
+    frame    <- newRef 0
     renderer <- Renderer.createWebGL {antialias: true}
     scene    <- Scene.create
     camera   <- Camera.createPerspective 45 (width/height) 1 1000
     material <- Material.createShader {
-                      vertexShader:   vertexShader
+                      uniforms: initUniforms
+                    , vertexShader:   vertexShader
                     , fragmentShader: fragmentShader
                 }
-    circle   <- Geometry.createCircle 30 32 0 (2*Math.pi)
+    circle   <- Geometry.createCircle radius 32 0 (2*Math.pi)
     cube     <- Mesh.create circle material
 
     Camera.posZ camera 500
@@ -86,7 +144,9 @@ main = do
     Renderer.setSize renderer width height
     Renderer.appendToDomByID renderer "container"
 
-    doAnimation $ rotateCube renderer scene camera cube 0.01
+    let c = context renderer scene camera cube material
+
+    doAnimation $ renderContext frame c
 
     return Unit
 
@@ -98,4 +158,5 @@ foreign import requestAnimationFrame """
         }
     }
     """ :: forall eff. Eff eff Unit -> Eff eff Unit
+
 

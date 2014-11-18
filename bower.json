@@ -23,9 +23,10 @@
     "threejs": "*"
   },
   "devDependencies": {
-    "purescript-foreign": "~0.2.0",
-    "purescript-easy-ffi": "^1.0.0",
-    "purescript-dom": "~0.1.1",
-    "purescript-math": "~0.1.0"
+    "purescript-foreign": "*",
+    "purescript-easy-ffi": "*",
+    "purescript-dom": "*",
+    "purescript-math": "*",
+    "purescript-refs": "*"
   }
 }

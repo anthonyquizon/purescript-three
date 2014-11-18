@@ -16,3 +16,9 @@ createMeshBasic = ffi ["param", ""] "new THREE.MeshBasicMaterial(param)"
 createShader :: forall eff opt. {|opt} -> Eff (three :: Three | eff) Material
 createShader = ffi ["param", ""] "new THREE.ShaderMaterial(param)"
 
+setUniform :: forall eff a. Material -> String -> a -> Eff (three :: Three | eff) Unit
+setUniform = ffi ["material", "key", "value", ""] "material.uniforms[key].value = value"
+
+getUniform :: forall eff opt. Material -> String -> Eff (three :: Three | eff) Number
+getUniform = ffi ["material", "key", ""] "material.uniforms[key].value"
+

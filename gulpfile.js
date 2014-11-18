@@ -62,17 +62,19 @@ gulp.task('examples', function() {
                 main: true
             }
 
-
         compile(src, dest, opts);
     }
+});
 
+gulp.task('server', function() {
     connect.server({
         root: 'examples'
     });
 });
 
-gulp.task('watch', ['build'], function() {
+gulp.task('watch', ['build', 'examples'], function() {
 	gulp.watch(library.src, ['build', 'dotPsci']);
+	gulp.watch("examples/**/*.purs", ['examples']);
     //TODO build docs
 });
 
