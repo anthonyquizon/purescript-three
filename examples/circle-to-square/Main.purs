@@ -16,12 +16,34 @@ import Debug.Trace
 
 data Shape = Shape {
           mesh :: Mesh.Mesh
-        , cX   :: Number
-        , cY   :: Number
     }
 
-width = 500
-height = 500
+width    = 500
+height   = 500
+interval = 20
+
+vertexShader :: String
+vertexShader = """
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+
+    void main() {
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+    }
+"""
+
+fragmentShader :: String 
+fragmentShader = """
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+
+    void main() {
+        gl_FragColor = vec4(1.0,0.0,1.0,1.0);
+    }
+"""
+
 
 doAnimation :: forall eff. Eff (three :: Three | eff) Unit -> Eff (three :: Three | eff) Unit
 doAnimation animate = do
@@ -35,6 +57,7 @@ rotateCube :: forall eff. Renderer.Renderer ->
                           Number -> 
                           Eff (three :: Three | eff) Unit
 rotateCube renderer scene camera mesh n = do
+    --modulo 60
     --timing
     Renderer.render renderer scene camera
 
@@ -45,15 +68,12 @@ circleMorphSquare circle fac = do
 --}
 
 main = do
-    frag <- getShader "#fragmentShader"
-    vert <- getShader "#vertexShader"
-
     renderer <- Renderer.createWebGL {antialias: true}
     scene    <- Scene.create
     camera   <- Camera.createPerspective 45 (width/height) 1 1000
     material <- Material.createShader {
-                      vertexShader:   vert
-                    , fragmentShader: frag
+                      vertexShader:   vertexShader
+                    , fragmentShader: fragmentShader
                 }
     circle   <- Geometry.createCircle 30 32 0 (2*Math.pi)
     cube     <- Mesh.create circle material
@@ -70,15 +90,6 @@ main = do
 
     return Unit
 
-
-foreign import getShader """
-    function getShader(label) {
-        return function() {
-            var el = document.querySelector(label);
-            return el.innerHTML;
-        };
-    }
-""" :: forall eff. String -> Eff (dom :: DOM | eff) String
 
 foreign import requestAnimationFrame """
     function requestAnimationFrame(callback) {

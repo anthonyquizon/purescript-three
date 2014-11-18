@@ -13,4 +13,6 @@ create = ffi ["param", ""] "new THREE.Material(param)"
 createMeshBasic :: forall eff opt. {|opt} -> Eff (three :: Three | eff) Material
 createMeshBasic = ffi ["param", ""] "new THREE.MeshBasicMaterial(param)"
 
+createShader :: forall eff opt. {|opt} -> Eff (three :: Three | eff) Material
+createShader = ffi ["param", ""] "new THREE.ShaderMaterial(param)"
 
