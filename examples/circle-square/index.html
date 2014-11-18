@@ -13,6 +13,28 @@
 <body>
     <div id="container"></div>
 
+	<script type="x-shader/x-vertex" id="vertexShader">
+		#ifdef GL_ES
+		precision highp float;
+		#endif
+
+		void main() {
+			gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+		}
+
+	</script>
+
+	<script type="x-shader/x-fragment" id="fragmentShader">
+		#ifdef GL_ES
+		precision highp float;
+		#endif
+
+		void main() {
+			gl_FragColor = vec4(1.0,0.0,1.0,1.0);
+		}
+	</script>
+
+
     <script src="/bower_components/threejs/build/three.js"></script>
     <script src="output/main.js"></script>
 </body>

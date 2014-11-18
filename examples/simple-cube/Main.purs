@@ -1,4 +1,3 @@
-
 module Main where
 
 import           Control.Monad.Eff
@@ -59,5 +58,4 @@ foreign import requestAnimationFrame """
         }
     }
     """ :: forall eff. Eff eff Unit -> Eff eff Unit
-    {--""" :: forall eff. Eff (three :: Three | eff) Unit -> Eff eff Unit--}
 

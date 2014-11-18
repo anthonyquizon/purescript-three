@@ -1,6 +1,7 @@
 module Main where
 
 import           Control.Monad.Eff
+import           DOM
 import qualified Graphics.Three.Renderer as Renderer
 import qualified Graphics.Three.Scene    as Scene
 import qualified Graphics.Three.Camera   as Camera
@@ -8,9 +9,16 @@ import qualified Graphics.Three.Material as Material
 import qualified Graphics.Three.Geometry as Geometry
 import qualified Graphics.Three.Mesh     as Mesh
 import           Graphics.Three.Types     
+import qualified Math           as Math
 
 import Debug.Trace
 
+
+data Shape = Shape {
+          mesh :: Mesh.Mesh
+        , cX   :: Number
+        , cY   :: Number
+    }
 
 width = 500
 height = 500
@@ -27,16 +35,28 @@ rotateCube :: forall eff. Renderer.Renderer ->
                           Number -> 
                           Eff (three :: Three | eff) Unit
 rotateCube renderer scene camera mesh n = do
-    Mesh.rotateIncrement mesh 0 n 0
+    --timing
     Renderer.render renderer scene camera
 
+{--circleMorphSquare :: forall eff. Shape -> Eff (three :: Three | eff) Unit
+circleMorphSquare circle fac = do
+    -- get fraction
+    return Unit
+--}
+
 main = do
+    frag <- getShader "#fragmentShader"
+    vert <- getShader "#vertexShader"
+
     renderer <- Renderer.createWebGL {antialias: true}
     scene    <- Scene.create
     camera   <- Camera.createPerspective 45 (width/height) 1 1000
-    material <- Material.createMeshBasic {}
-    box      <- Geometry.createBox 100 100 100
-    cube     <- Mesh.create box material
+    material <- Material.createShader {
+                      vertexShader:   vert
+                    , fragmentShader: frag
+                }
+    circle   <- Geometry.createCircle 30 32 0 (2*Math.pi)
+    cube     <- Mesh.create circle material
 
     Camera.posZ camera 500
 
@@ -51,6 +71,15 @@ main = do
     return Unit
 
 
+foreign import getShader """
+    function getShader(label) {
+        return function() {
+            var el = document.querySelector(label);
+            return el.innerHTML;
+        };
+    }
+""" :: forall eff. String -> Eff (dom :: DOM | eff) String
+
 foreign import requestAnimationFrame """
     function requestAnimationFrame(callback) {
         return function() {
@@ -58,5 +87,4 @@ foreign import requestAnimationFrame """
         }
     }
     """ :: forall eff. Eff eff Unit -> Eff eff Unit
-    {--""" :: forall eff. Eff (three :: Three | eff) Unit -> Eff eff Unit--}
 
