@@ -30,6 +30,32 @@ function compile(src, dest, options) {
                .pipe(gulp.dest(dest));
 }
 
+function compileExample(name) {
+
+    var dir  = 'examples/' + name + '/'
+      , src  = library.src.concat(dir + '*.purs')
+      , dest = dir + 'output/'
+      , opts = {
+            output: 'main.js', 
+            main: true
+        }
+
+    compile(src, dest, opts);
+}
+
+function forExamples(callback) {
+    var dirs = fs.readdirSync('examples');
+   
+    for (var i=0; i<dirs.length; i++) {
+
+        if (dirs[i] == "bower_components") {
+            continue;
+        }
+
+        callback(dirs[i]);
+    }
+}
+
 gulp.task('dotPsci', function() {
     var psci = purescript.dotPsci();
 
@@ -47,23 +73,7 @@ gulp.task('build', function() {
 });
 
 gulp.task('examples', function() {
-    var dirs = fs.readdirSync('examples');
-   
-    for (var i=0; i<dirs.length; i++) {
-
-        if (dirs[i] == "bower_components") {
-            continue;
-        }
-        var dir  = 'examples/' + dirs[i] + '/'
-          , src  = library.src.concat(dir + '*.purs')
-          , dest = dir + 'output/'
-          , opts = {
-                output: 'main.js', 
-                main: true
-            }
-
-        compile(src, dest, opts);
-    }
+    forExamples(compileExample);
 });
 
 gulp.task('server', function() {
@@ -72,9 +82,20 @@ gulp.task('server', function() {
     });
 });
 
+forExamples(function(name) {
+    gulp.task('example-' + name, function() {
+        compileExample(name);
+    });
+});
+
 gulp.task('watch', ['build', 'examples'], function() {
 	gulp.watch(library.src, ['build', 'dotPsci']);
-	gulp.watch("examples/**/*.purs", ['examples']);
+
+    forExamples(function(name) {
+        var src = 'examples/' + name + '/**/*.purs'
+        gulp.watch(src, ['example-' + name]);
+    });
+
     //TODO build docs
 });
 
