@@ -45,10 +45,13 @@ function compileExample(name) {
 
 function forExamples(callback) {
     var dirs = fs.readdirSync('examples');
-   
+    
     for (var i=0; i<dirs.length; i++) {
+        var name = dirs[i];
 
-        if (dirs[i] == "bower_components") {
+        if (!fs.lstatSync("examples/" + name).isDirectory() ||
+            dirs[i] == "bower_components")
+        {
             continue;
         }
 
