@@ -15,6 +15,26 @@ import           Graphics.Three.Types
 
 width    = 500
 height   = 500
+radius   = 50.0
+
+newtype Context = Context {
+          renderer :: Renderer.Renderer 
+        , scene    :: Scene.Scene
+        , camera   :: Camera.Camera
+        , mesh     :: Mesh.Mesh
+        , material :: Material.Material
+    }
+
+context :: Renderer.Renderer -> Scene.Scene -> 
+           Camera.Camera     -> Mesh.Mesh   -> 
+           Material.Material -> Context
+context r s c me ma = Context {
+          renderer: r
+        , scene:    s
+        , camera:   c
+        , mesh:     me
+        , material: ma
+    }
 
 newtype Pos = Pos {
           x :: Number
@@ -50,6 +70,44 @@ stateRef f p pv = StateRef {
         , prev: pv
     }
 
+initUniforms = {
+        amount: {
+             "type" : "f"
+            , value : 0.0
+        },
+        radius: {
+             "type" : "f"
+            , value : radius
+        }
+    }
+
+vertexShader :: String
+vertexShader = """
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+
+    uniform float amount;
+    uniform float radius;
+
+    void main() {
+        vec3 pos = position;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+    }
+"""
+
+fragmentShader :: String 
+fragmentShader = """
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+
+    void main() {
+        gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+    }
+"""
+
+
 
 initStateRef :: StateRef
 initStateRef = stateRef 0 nPos nPos
@@ -62,16 +120,15 @@ doAnimation animate = do
     requestAnimationFrame $ doAnimation animate
 
 
-renderContext :: forall a eff. RefVal StateRef -> 
+renderContext :: forall a eff. RefVal StateRef -> Context ->
                  Eff ( trace :: Trace, ref :: Ref, three :: Three | eff) Unit
-renderContext state = do
+renderContext state (Context c) = do
     
     modifyRef state $ \(StateRef s) -> stateRef (s.frame + 1) s.pos s.prev
     s'@(StateRef s) <- readRef state
     
-    print s'
-    return unit
-    {--Renderer.render c.renderer c.scene c.camera--}
+    {--print s'--}
+    Renderer.render c.renderer c.scene c.camera
 
 
 onMouseMove :: forall eff. RefVal StateRef -> Number -> Number -> Eff (ref :: Ref, trace :: Trace, dom :: DOM | eff) Unit
@@ -82,12 +139,28 @@ onMouseMove state x y = do
 main = do
     state    <- newRef initStateRef
     renderer <- Renderer.createWebGL {antialias: true}
+    scene    <- Scene.create
+    camera   <- Camera.createPerspective 45 (width/height) 1 1000
+    material <- Material.createShader {
+                      uniforms: initUniforms
+                    , vertexShader:   vertexShader
+                    , fragmentShader: fragmentShader
+                }
+    circle   <- Geometry.createCircle radius 32 0 (2*Math.pi)
+    mesh     <- Mesh.create circle material
+
+    Camera.posZ camera 500
+
+    Scene.addCamera scene camera
+    Scene.addMesh scene mesh
 
     Renderer.setSize renderer width height
     Renderer.appendToDomByID renderer "container"
 
+    let c = context renderer scene camera mesh material
+
     mouseMove $ onMouseMove state
-    doAnimation $ renderContext state
+    doAnimation $ renderContext state c
 
 
 foreign import mouseMove """
