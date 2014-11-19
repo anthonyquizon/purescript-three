@@ -1,4 +1,4 @@
-module Graphics.Three.Camera where
+module Graphics.Three.Scene.Object3D.Camera where
 
 import Control.Monad.Eff
 import Data.Function

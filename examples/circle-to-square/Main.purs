@@ -3,12 +3,12 @@ module Main where
 import           Control.Monad.Eff
 import           Control.Monad.Eff.Ref
 import           DOM
-import qualified Graphics.Three.Renderer as Renderer
-import qualified Graphics.Three.Scene    as Scene
-import qualified Graphics.Three.Camera   as Camera
-import qualified Graphics.Three.Material as Material
-import qualified Graphics.Three.Geometry as Geometry
-import qualified Graphics.Three.Mesh     as Mesh
+import qualified Graphics.Three.Renderer    as Renderer
+import qualified Graphics.Three.Material    as Material
+import qualified Graphics.Three.Geometry    as Geometry
+import qualified Graphics.Three.Scene       as Scene
+import qualified Graphics.Three.Scene.Object3D.Camera      as Camera
+import qualified Graphics.Three.Scene.Object3D.Mesh as Mesh
 import           Graphics.Three.Types     
 import qualified Math           as Math
 
@@ -137,17 +137,17 @@ main = do
                     , fragmentShader: fragmentShader
                 }
     circle   <- Geometry.createCircle radius 32 0 (2*Math.pi)
-    cube     <- Mesh.create circle material
+    mesh     <- Mesh.create circle material
 
     Camera.posZ camera 500
 
     Scene.addCamera scene camera
-    Scene.addMesh scene cube
+    Scene.addMesh scene mesh
 
     Renderer.setSize renderer width height
     Renderer.appendToDomByID renderer "container"
 
-    let c = context renderer scene camera cube material
+    let c = context renderer scene camera mesh material
 
     doAnimation $ renderContext frame c
 

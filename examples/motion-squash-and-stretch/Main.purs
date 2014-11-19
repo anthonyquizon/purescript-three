@@ -5,12 +5,13 @@ import Debug.Trace
 import           Control.Monad.Eff
 import           Control.Monad.Eff.Ref
 import           DOM
-import qualified Graphics.Three.Renderer as Renderer
-import qualified Graphics.Three.Scene    as Scene
-import qualified Graphics.Three.Camera   as Camera
-import qualified Graphics.Three.Material as Material
-import qualified Graphics.Three.Geometry as Geometry
-import qualified Graphics.Three.Mesh     as Mesh
+import qualified Graphics.Three.Renderer    as Renderer
+import qualified Graphics.Three.Scene       as Scene
+import qualified Graphics.Three.Material    as Material
+import qualified Graphics.Three.Geometry    as Geometry
+import qualified Graphics.Three.Scene.Object3D.Camera      as Camera
+import qualified Graphics.Three.Scene.Object3D.Mesh as Mesh
+import qualified Graphics.Three.Scene.Object3D as Object
 import           Graphics.Three.Types     
 
 width    = 500
@@ -120,14 +121,25 @@ doAnimation animate = do
     requestAnimationFrame $ doAnimation animate
 
 
-renderContext :: forall a eff. RefVal StateRef -> Context ->
+shapeMotion :: forall eff. Mesh.Mesh -> Number -> Pos -> Eff (trace :: Trace, three :: Three | eff) Unit
+shapeMotion me f (Pos p) = do
+    {--Object.setPosition me p.x p.y 0--}
+    return unit
+
+renderContext :: forall eff. RefVal StateRef -> Context ->
                  Eff ( trace :: Trace, ref :: Ref, three :: Three | eff) Unit
 renderContext state (Context c) = do
     
     modifyRef state $ \(StateRef s) -> stateRef (s.frame + 1) s.pos s.prev
     s'@(StateRef s) <- readRef state
+
+    shapeMotion c.mesh s.frame s.pos
+    -- calculate velocity
+        -- direction
+        -- speed
+    -- set uniform
+    -- translate mesh to position
     
-    {--print s'--}
     Renderer.render c.renderer c.scene c.camera
 
 

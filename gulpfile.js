@@ -102,5 +102,5 @@ gulp.task('watch', ['build', 'examples'], function() {
     //TODO build docs
 });
 
-gulp.task('default', ['build', 'dotPsci']);
+gulp.task('default', ['build', 'examples', 'dotPsci']);
 
