@@ -11,7 +11,7 @@ import qualified Graphics.Three.Material    as Material
 import qualified Graphics.Three.Geometry    as Geometry
 import qualified Graphics.Three.Scene.Object3D.Camera      as Camera
 import qualified Graphics.Three.Scene.Object3D.Mesh as Mesh
-import qualified Graphics.Three.Scene.Object3D as Object
+import qualified Graphics.Three.Scene.Object3D.Types as ObjectTypes
 import qualified Graphics.Three.Math.Vector as Vector
 import           Graphics.Three.Types     
 
@@ -133,7 +133,7 @@ doAnimation animate = do
 
 shapeMotion :: forall eff. Mesh.Mesh -> Material.Material -> Number -> Pos -> Pos -> Eff (trace :: Trace, three :: Three | eff) Unit
 shapeMotion me mat f (Pos p1) (Pos p2) = do
-    Object.setPosition me p1.x p1.y 0
+    ObjectTypes.setPosition me p1.x p1.y 0
     
     Material.setUniform mat "delta" $ Vector.createVec3 dx dy 0
     

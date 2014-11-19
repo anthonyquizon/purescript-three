@@ -6,7 +6,7 @@ import qualified Graphics.Three.Geometry as Geo
 import qualified Graphics.Three.Material as Mat
 import           Graphics.Three.Types
 import           Graphics.Three.Util
-import           Graphics.Three.Scene.Object3D
+import           Graphics.Three.Scene.Object3D.Types
 
 foreign import data Mesh :: *
 

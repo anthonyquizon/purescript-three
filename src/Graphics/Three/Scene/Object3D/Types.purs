@@ -1,4 +1,4 @@
-module Graphics.Three.Scene.Object3D where
+module Graphics.Three.Scene.Object3D.Types where
 
 import Graphics.Three.Math.Vector
 import Graphics.Three.Types
