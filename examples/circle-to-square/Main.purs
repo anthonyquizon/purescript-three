@@ -62,12 +62,13 @@ vertexShader = """
 
     float morph(in float p) {
         float eps = 0.1;
+        float scale = radius*1.6;
 
         if (p < -eps) {
-           return mix(p, -radius, amount); //TODO uniform width
+           return mix(p, -scale, amount); //TODO uniform width
         }
         if (p > eps) {
-           return mix(p, radius, amount);
+           return mix(p, scale, amount);
         }
 
         return 0.0;
@@ -96,6 +97,8 @@ fragmentShader = """
 
 clamp :: Number -> Number
 clamp n = Math.min 1.0 $ Math.max (0.0) n
+
+--TODO square wave with ease functions
 
 morphShape :: forall eff. Material.Material -> Number -> Eff (trace :: Trace, three :: Three | eff) Unit
 morphShape ma n = do

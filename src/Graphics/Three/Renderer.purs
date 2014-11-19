@@ -20,7 +20,7 @@ render :: forall eff. Renderer -> Sce.Scene -> Cam.Camera -> Eff (three :: Three
 render = fpi ["renderer", "scene", "camera", ""] "renderer.render(scene, camera)"
 
 domElement :: forall eff. Renderer -> Eff (three :: Three, dom :: DOM | eff) Node
-domElement = ffi ["renderer"] "renderer.domElement"
+domElement = ffi ["renderer", ""] "renderer.domElement"
 
 appendToDomByID :: forall eff. Renderer -> String -> Eff (three :: Three, dom :: DOM | eff) Unit
 appendToDomByID = fpi ["renderer", "idStr", ""] 
