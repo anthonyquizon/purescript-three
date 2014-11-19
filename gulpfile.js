@@ -92,7 +92,7 @@ forExamples(function(name) {
 });
 
 gulp.task('watch', ['build', 'examples'], function() {
-	gulp.watch(library.src, ['build', 'dotPsci']);
+	gulp.watch(library.src, ['build', 'examples', 'dotPsci']);
 
     forExamples(function(name) {
         var src = 'examples/' + name + '/**/*.purs'
