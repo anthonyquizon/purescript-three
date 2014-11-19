@@ -12,11 +12,12 @@ import qualified Graphics.Three.Geometry    as Geometry
 import qualified Graphics.Three.Scene.Object3D.Camera      as Camera
 import qualified Graphics.Three.Scene.Object3D.Mesh as Mesh
 import qualified Graphics.Three.Scene.Object3D as Object
+import qualified Graphics.Three.Math.Vector as Vector
 import           Graphics.Three.Types     
 
 width    = 500
 height   = 500
-radius   = 50.0
+radius   = 20.0
 
 newtype Context = Context {
           renderer :: Renderer.Renderer 
@@ -72,13 +73,17 @@ stateRef f p pv = StateRef {
     }
 
 initUniforms = {
-        amount: {
-             "type" : "f"
-            , value : 0.0
+        delta: {
+             "type": "v3"
+            , value: Vector.createVec3 0 0 0
         },
         radius: {
              "type" : "f"
             , value : radius
+        },
+        drag: {
+             "type" : "f"
+            , value : 0.05
         }
     }
 
@@ -88,11 +93,17 @@ vertexShader = """
     precision highp float;
     #endif
 
-    uniform float amount;
+    uniform vec3 delta;
     uniform float radius;
+    uniform float drag;
 
     void main() {
         vec3 pos = position;
+        float p = distance(position, delta) / radius;
+
+        vec3 temp = delta * p;
+        pos += (position - temp)*0.3;
+
         gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
     }
 """
@@ -120,11 +131,17 @@ doAnimation animate = do
     animate
     requestAnimationFrame $ doAnimation animate
 
-
-shapeMotion :: forall eff. Mesh.Mesh -> Number -> Pos -> Eff (trace :: Trace, three :: Three | eff) Unit
-shapeMotion me f (Pos p) = do
-    {--Object.setPosition me p.x p.y 0--}
+shapeMotion :: forall eff. Mesh.Mesh -> Material.Material -> Number -> Pos -> Pos -> Eff (trace :: Trace, three :: Three | eff) Unit
+shapeMotion me mat f (Pos p1) (Pos p2) = do
+    Object.setPosition me p1.x p1.y 0
+    
+    Material.setUniform mat "delta" $ Vector.createVec3 dx dy 0
+    
     return unit
+    where
+        dx = p2.x - p1.x
+        dy = p2.y - p1.y
+
 
 renderContext :: forall eff. RefVal StateRef -> Context ->
                  Eff ( trace :: Trace, ref :: Ref, three :: Three | eff) Unit
@@ -133,19 +150,14 @@ renderContext state (Context c) = do
     modifyRef state $ \(StateRef s) -> stateRef (s.frame + 1) s.pos s.prev
     s'@(StateRef s) <- readRef state
 
-    shapeMotion c.mesh s.frame s.pos
-    -- calculate velocity
-        -- direction
-        -- speed
-    -- set uniform
-    -- translate mesh to position
+    shapeMotion c.mesh c.material s.frame s.pos s.prev
     
     Renderer.render c.renderer c.scene c.camera
 
 
 onMouseMove :: forall eff. RefVal StateRef -> Number -> Number -> Eff (ref :: Ref, trace :: Trace, dom :: DOM | eff) Unit
 onMouseMove state x y = do
-    modifyRef state $ \(StateRef s) -> stateRef s.frame s.prev (pos x y)
+    modifyRef state $ \(StateRef s) -> stateRef s.frame (pos x y) s.pos
     return unit
 
 main = do
@@ -182,8 +194,11 @@ foreign import mouseMove """
 
             node.addEventListener('mousemove', function(e) {
                 var rect = node.getBoundingClientRect(),
-                    x    = e.x - rect.left,
-                    y    = e.y - rect.top;
+                    x    = (e.x - rect.left) - rect.width/2,
+                    y    = - (e.y - rect.top) + rect.height/2;
+
+                    //x =   (e.clientX / rect.width ) * 2 - 1
+                    //y = - (e.clientY / rect.height ) * 2 + 1
 
                 handler(x)(y)();
             });
@@ -198,4 +213,6 @@ foreign import requestAnimationFrame """
         }
     }
     """ :: forall eff. Eff eff Unit -> Eff eff Unit
+
+
 
