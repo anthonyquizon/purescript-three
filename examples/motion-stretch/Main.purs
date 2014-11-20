@@ -15,28 +15,12 @@ import qualified Graphics.Three.Scene.Object3D.Types as ObjectTypes
 import qualified Graphics.Three.Math.Vector as Vector
 import           Graphics.Three.Types     
 
+import Examples.Common
+
 width    = 500
 height   = 500
 radius   = 20.0
 
-newtype Context = Context {
-          renderer :: Renderer.Renderer 
-        , scene    :: Scene.Scene
-        , camera   :: Camera.Camera
-        , mesh     :: Mesh.Mesh
-        , material :: Material.Material
-    }
-
-context :: Renderer.Renderer -> Scene.Scene -> 
-           Camera.Camera     -> Mesh.Mesh   -> 
-           Material.Material -> Context
-context r s c me ma = Context {
-          renderer: r
-        , scene:    s
-        , camera:   c
-        , mesh:     me
-        , material: ma
-    }
 
 newtype Pos = Pos {
           x :: Number
@@ -126,11 +110,6 @@ initStateRef = stateRef 0 nPos nPos
     where
         nPos = pos 0 0
 
-doAnimation :: forall eff. Eff (three :: Three | eff) Unit -> Eff (three :: Three | eff) Unit
-doAnimation animate = do
-    animate
-    requestAnimationFrame $ doAnimation animate
-
 shapeMotion :: forall eff. Mesh.Mesh -> Material.Material -> Number -> Pos -> Pos -> Eff (trace :: Trace, three :: Three | eff) Unit
 shapeMotion me mat f (Pos p1) (Pos p2) = do
     ObjectTypes.setPosition me p1.x p1.y 0
@@ -205,14 +184,4 @@ foreign import mouseMove """
         };
     }
 """ :: forall eff. (Number -> Number -> Eff (dom :: DOM | eff) Unit) -> Eff (dom :: DOM | eff) Unit
-
-foreign import requestAnimationFrame """
-    function requestAnimationFrame(callback) {
-        return function() {
-            return window.requestAnimationFrame(callback);
-        }
-    }
-    """ :: forall eff. Eff eff Unit -> Eff eff Unit
-
-
 

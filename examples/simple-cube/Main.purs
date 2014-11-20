@@ -8,17 +8,13 @@ import qualified Graphics.Three.Material as Material
 import qualified Graphics.Three.Geometry as Geometry
 import qualified Graphics.Three.Scene.Object3D.Mesh     as Mesh
 import           Graphics.Three.Types     
+import           Examples.Common
 
 import Debug.Trace
 
 
 width = 500
 height = 500
-
-doAnimation :: forall eff. Eff (three :: Three | eff) Unit -> Eff (three :: Three | eff) Unit
-doAnimation animate = do
-    animate
-    requestAnimationFrame $ doAnimation animate
 
 rotateCube :: forall eff. Renderer.Renderer -> 
                           Scene.Scene -> 
@@ -50,12 +46,4 @@ main = do
 
     return Unit
 
-
-foreign import requestAnimationFrame """
-    function requestAnimationFrame(callback) {
-        return function() {
-            return window.requestAnimationFrame(callback);
-        }
-    }
-    """ :: forall eff. Eff eff Unit -> Eff eff Unit
 

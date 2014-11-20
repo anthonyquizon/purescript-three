@@ -16,6 +16,7 @@ var library = {
     options : {}
 };
 
+var common = "examples/Common.purs"
 
 function compile(src, dest, options) {
 	var psc = purescript.psc(options);
@@ -32,8 +33,9 @@ function compile(src, dest, options) {
 
 function compileExample(name) {
 
-    var dir  = 'examples/' + name + '/'
-      , src  = library.src.concat(dir + '*.purs')
+    var dir   = 'examples/' + name + '/'
+      , lib  = library.src.concat(common)
+      , src  = lib.concat(dir + '*.purs')
       , dest = dir + 'output/'
       , opts = {
             output: 'main.js', 
@@ -93,6 +95,7 @@ forExamples(function(name) {
 
 gulp.task('watch', ['build', 'examples'], function() {
 	gulp.watch(library.src, ['build', 'examples', 'dotPsci']);
+	gulp.watch(common, ['examples']);
 
     forExamples(function(name) {
         var src = 'examples/' + name + '/**/*.purs'

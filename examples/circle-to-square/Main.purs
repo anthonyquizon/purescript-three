@@ -12,6 +12,7 @@ import qualified Graphics.Three.Scene.Object3D.Mesh as Mesh
 import           Graphics.Three.Types     
 import qualified Math           as Math
 
+import Examples.Common
 import Debug.Trace
 
 
@@ -21,24 +22,6 @@ interval = 200
 radius   = 50.0
 
 
-newtype Context = Context {
-          renderer :: Renderer.Renderer 
-        , scene    :: Scene.Scene
-        , camera   :: Camera.Camera
-        , mesh     :: Mesh.Mesh
-        , material :: Material.Material
-    }
-
-context :: Renderer.Renderer -> Scene.Scene -> 
-           Camera.Camera     -> Mesh.Mesh   -> 
-           Material.Material -> Context
-context r s c me ma = Context {
-          renderer: r
-        , scene:    s
-        , camera:   c
-        , mesh:     me
-        , material: ma
-    }
 
 initUniforms = {
         amount: {
@@ -110,10 +93,6 @@ morphShape ma n = do
     return unit
 
 
-doAnimation :: forall eff. Eff (three :: Three | eff) Unit -> Eff (three :: Three | eff) Unit
-doAnimation animate = do
-    animate
-    requestAnimationFrame $ doAnimation animate
 
 renderContext :: forall a eff. RefVal Number -> Context -> 
                        Eff ( trace :: Trace, ref :: Ref, three :: Three | eff) Unit
@@ -154,12 +133,5 @@ main = do
     return Unit
 
 
-foreign import requestAnimationFrame """
-    function requestAnimationFrame(callback) {
-        return function() {
-            return window.requestAnimationFrame(callback);
-        }
-    }
-    """ :: forall eff. Eff eff Unit -> Eff eff Unit
 
 
