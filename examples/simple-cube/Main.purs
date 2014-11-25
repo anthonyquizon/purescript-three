@@ -13,37 +13,21 @@ import           Examples.Common
 import Debug.Trace
 
 
-width = 500
-height = 500
-
-rotateCube :: forall eff. Renderer.Renderer -> 
-                          Scene.Scene -> 
-                          Camera.Camera -> 
+rotateCube :: forall eff. Context -> 
                           Mesh.Mesh -> 
                           Number -> 
                           Eff (three :: Three | eff) Unit
-rotateCube renderer scene camera mesh n = do
+rotateCube (Context c) mesh n = do
     Mesh.rotateIncrement mesh 0 n 0
-    Renderer.render renderer scene camera
+    Renderer.render c.renderer c.scene c.camera
 
 main = do
-    renderer <- Renderer.createWebGL {antialias: true}
-    scene    <- Scene.create
-    camera   <- Camera.createPerspective 45 (width/height) 1 1000
-    material <- Material.createMeshBasic {}
-    box      <- Geometry.createBox 100 100 100
-    cube     <- Mesh.create box material
+    ctx@(Context c) <- init
+    material        <- Material.createMeshBasic {}
+    box             <- Geometry.createBox 100 100 100
+    cube            <- Mesh.create box material
 
-    Camera.posZ camera 500
+    Scene.addMesh c.scene cube
 
-    Scene.addCamera scene camera
-    Scene.addMesh scene cube
-
-    Renderer.setSize renderer width height
-    Renderer.appendToDomByID renderer "container"
-
-    doAnimation $ rotateCube renderer scene camera cube 0.01
-
-    return Unit
-
+    doAnimation $ rotateCube ctx cube 0.01
 

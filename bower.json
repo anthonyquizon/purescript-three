@@ -27,6 +27,7 @@
     "purescript-easy-ffi": "*",
     "purescript-dom": "*",
     "purescript-math": "*",
-    "purescript-refs": "*"
+    "purescript-refs": "*",
+    "purescript-transformers": "*"
   }
 }

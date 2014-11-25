@@ -17,10 +17,7 @@ import           Graphics.Three.Types
 
 import Examples.Common
 
-width    = 500
-height   = 500
 radius   = 20.0
-
 
 newtype Pos = Pos {
           x :: Number
@@ -110,10 +107,11 @@ initStateRef = stateRef 0 nPos nPos
     where
         nPos = pos 0 0
 
-shapeMotion :: forall eff. Mesh.Mesh -> Material.Material -> Number -> Pos -> Pos -> Eff (trace :: Trace, three :: Three | eff) Unit
-shapeMotion me mat f (Pos p1) (Pos p2) = do
+shapeMotion :: forall eff. Mesh.Mesh -> Number -> Pos -> Pos -> Eff (trace :: Trace, three :: Three | eff) Unit
+shapeMotion me f (Pos p1) (Pos p2) = do
+    mat <- Mesh.getMaterial me
+
     ObjectTypes.setPosition me p1.x p1.y 0
-    
     Material.setUniform mat "delta" $ Vector.createVec3 dx dy 0
     
     return unit
@@ -122,14 +120,14 @@ shapeMotion me mat f (Pos p1) (Pos p2) = do
         dy = p2.y - p1.y
 
 
-renderContext :: forall eff. RefVal StateRef -> Context ->
+renderContext :: forall eff. RefVal StateRef -> Context -> Mesh.Mesh ->
                  Eff ( trace :: Trace, ref :: Ref, three :: Three | eff) Unit
-renderContext state (Context c) = do
+renderContext state (Context c) me = do
     
     modifyRef state $ \(StateRef s) -> stateRef (s.frame + 1) s.pos s.prev
     s'@(StateRef s) <- readRef state
 
-    shapeMotion c.mesh c.material s.frame s.pos s.prev
+    shapeMotion me s.frame s.pos s.prev
     
     Renderer.render c.renderer c.scene c.camera
 
@@ -140,30 +138,20 @@ onMouseMove state x y = do
     return unit
 
 main = do
-    state    <- newRef initStateRef
-    renderer <- Renderer.createWebGL {antialias: true}
-    scene    <- Scene.create
-    camera   <- Camera.createPerspective 45 (width/height) 1 1000
-    material <- Material.createShader {
-                      uniforms: initUniforms
-                    , vertexShader:   vertexShader
-                    , fragmentShader: fragmentShader
-                }
-    circle   <- Geometry.createCircle radius 32 0 (2*Math.pi)
-    mesh     <- Mesh.create circle material
+    ctx@(Context c) <- init
+    state           <- newRef initStateRef
+    material        <- Material.createShader {
+                            uniforms: initUniforms
+                            , vertexShader:   vertexShader
+                            , fragmentShader: fragmentShader
+                        }
+    circle          <- Geometry.createCircle radius 32 0 (2*Math.pi)
+    mesh            <- Mesh.create circle material
 
-    Camera.posZ camera 500
-
-    Scene.addCamera scene camera
-    Scene.addMesh scene mesh
-
-    Renderer.setSize renderer width height
-    Renderer.appendToDomByID renderer "container"
-
-    let c = context renderer scene camera mesh material
+    Scene.addMesh c.scene mesh
 
     mouseMove $ onMouseMove state
-    doAnimation $ renderContext state c
+    doAnimation $ renderContext state ctx mesh
 
 
 foreign import mouseMove """

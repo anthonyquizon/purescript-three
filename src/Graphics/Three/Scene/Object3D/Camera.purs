@@ -19,6 +19,13 @@ createPerspective :: forall eff. Number -> Number ->
 createPerspective = ffi ["fov", "aspect", "near", "far", ""]
     "new THREE.PerspectiveCamera(fov, aspect, near, far)"
 
+
+setAspect :: forall eff. Camera -> Number -> Eff (three :: Three | eff) Unit
+setAspect = fpi ["camera", "aspect", ""] "camera.aspect = aspect"
+
+updateProjectionMatrix :: forall eff. Camera -> Eff (three :: Three | eff) Unit
+updateProjectionMatrix = fpi ["camera", ""] "camera.updateProjectionMatrix()"
+
 foreign import posX """
     function posX(camera) {
         return function(x) {

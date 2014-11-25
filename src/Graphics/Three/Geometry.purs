@@ -22,8 +22,11 @@ createCircle :: forall eff. Number ->
 createCircle = ffi ["radius", "segments", "thetaStart", "thetaLength", ""] 
     "new THREE.CircleGeometry(radius, segments, thetaStart, thetaLength)"
 
-{--
-foreign import createCircle 
-    "var circle = new THREE.CircleGeometry(radius, segments, thetaStart, thetaLength)" 
-    :: Number -> Number -> Number -> Number -> Geometry
---}
+createPlane :: forall eff. Number -> 
+                           Number -> 
+                           Number -> 
+                           Eff (three :: Three | eff) Geometry
+createPlane = ffi ["width", "height", "length", "thetaLength", ""] 
+    "new THREE.PlaneGeometry(width, height, length);"
+
+

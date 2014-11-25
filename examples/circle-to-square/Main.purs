@@ -16,12 +16,8 @@ import Examples.Common
 import Debug.Trace
 
 
-width    = 500
-height   = 500
 interval = 200
 radius   = 50.0
-
-
 
 initUniforms = {
         amount: {
@@ -94,44 +90,29 @@ morphShape ma n = do
 
 
 
-renderContext :: forall a eff. RefVal Number -> Context -> 
+renderContext :: forall a eff. RefVal Number -> Context -> Material.Material ->
                        Eff ( trace :: Trace, ref :: Ref, three :: Three | eff) Unit
-renderContext frame (Context c) = do
+renderContext frame (Context c) mat = do
     
     modifyRef frame $ \f -> f + 1
     f <- readRef frame
 
-    morphShape c.material f
+    morphShape mat f
 
     Renderer.render c.renderer c.scene c.camera
 
 main = do
-    frame    <- newRef 0
-    renderer <- Renderer.createWebGL {antialias: true}
-    scene    <- Scene.create
-    camera   <- Camera.createPerspective 45 (width/height) 1 1000
-    material <- Material.createShader {
-                      uniforms: initUniforms
-                    , vertexShader:   vertexShader
-                    , fragmentShader: fragmentShader
-                }
-    circle   <- Geometry.createCircle radius 32 0 (2*Math.pi)
-    mesh     <- Mesh.create circle material
+    ctx@(Context c) <- init
+    frame           <- newRef 0
+    material        <- Material.createShader {
+                            uniforms: initUniforms
+                            , vertexShader:   vertexShader
+                            , fragmentShader: fragmentShader
+                        }
+    circle          <- Geometry.createCircle radius 32 0 (2*Math.pi)
+    mesh            <- Mesh.create circle material
 
-    Camera.posZ camera 500
+    Scene.addMesh c.scene mesh
 
-    Scene.addCamera scene camera
-    Scene.addMesh scene mesh
-
-    Renderer.setSize renderer width height
-    Renderer.appendToDomByID renderer "container"
-
-    let c = context renderer scene camera mesh material
-
-    doAnimation $ renderContext frame c
-
-    return Unit
-
-
-
+    doAnimation $ renderContext frame ctx material
 

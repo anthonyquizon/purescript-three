@@ -26,3 +26,8 @@ rotateIncrement = ffi ["mesh", "x", "y", "z"]
         }
     """
 
+getGeometry :: forall eff. Mesh -> Eff (three :: Three | eff) Geo.Geometry
+getGeometry = ffi ["mesh", ""] "mesh.geometry"
+
+getMaterial :: forall eff. Mesh -> Eff (three :: Three | eff) Mat.Material
+getMaterial = ffi ["mesh", ""] "mesh.material"
