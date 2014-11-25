@@ -82,13 +82,8 @@ clamp n = Math.min 1.0 $ Math.max (0.0) n
 morphShape :: forall eff. Material.Material -> Number -> Eff (trace :: Trace, three :: Three | eff) Unit
 morphShape ma n = do
     let a = (Math.sin $ ((2*Math.pi) / interval) * (n % interval)) * 0.5 + 0.5
-    
     Material.setUniform ma "amount" $ clamp a
-    print a
-
     return unit
-
-
 
 renderContext :: forall a eff. RefVal Number -> Context -> Material.Material ->
                        Eff ( trace :: Trace, ref :: Ref, three :: Three | eff) Unit

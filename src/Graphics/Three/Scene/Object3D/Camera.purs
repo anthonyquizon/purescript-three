@@ -4,13 +4,14 @@ import Control.Monad.Eff
 import Data.Function
 import Graphics.Three.Types
 import Graphics.Three.Util
+import Graphics.Three.Math.Vector
 
 foreign import data Camera :: *
 
-createOrthogonal :: forall eff. Number -> Number -> Number -> 
+createOrthographic:: forall eff. Number -> Number -> Number -> 
                        Number -> Number -> Number ->
                        Eff (three :: Three | eff) Camera
-createOrthogonal = ffi ["left", "right", "top", "bottom", "near", "far", ""] 
+createOrthographic = ffi ["left", "right", "top", "bottom", "near", "far", ""] 
     "new THREE.OrthographicCamera(left, right, top, bottom, near, far)"
 
 createPerspective :: forall eff. Number -> Number -> 
@@ -22,6 +23,20 @@ createPerspective = ffi ["fov", "aspect", "near", "far", ""]
 
 setAspect :: forall eff. Camera -> Number -> Eff (three :: Three | eff) Unit
 setAspect = fpi ["camera", "aspect", ""] "camera.aspect = aspect"
+
+
+updateOrthographic :: forall eff. Camera -> 
+                      Number -> Number -> Number -> Number ->
+                      Eff (three :: Three | eff) Unit
+updateOrthographic = fpi ["camera", "left", "right", "top", "bottom", ""] 
+    """  camera.left   = left;
+         camera.right  = right;
+         camera.top    = top;
+         camera.bottom = bottom;
+    """
+
+unproject :: forall eff. Camera -> Vector3 -> Eff (three :: Three | eff) Vector3
+unproject = ffi ["camera", "vector", ""] "vector.unproject(camera)"
 
 updateProjectionMatrix :: forall eff. Camera -> Eff (three :: Three | eff) Unit
 updateProjectionMatrix = fpi ["camera", ""] "camera.updateProjectionMatrix()"

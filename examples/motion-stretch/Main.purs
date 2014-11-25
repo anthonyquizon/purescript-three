@@ -17,7 +17,7 @@ import           Graphics.Three.Types
 
 import Examples.Common
 
-radius   = 20.0
+radius = 40.0
 
 newtype Pos = Pos {
           x :: Number
@@ -64,7 +64,7 @@ initUniforms = {
         },
         drag: {
              "type" : "f"
-            , value : 0.05
+            , value : 0.33
         }
     }
 
@@ -83,7 +83,7 @@ vertexShader = """
         float p = distance(position, delta) / radius;
 
         vec3 temp = delta * p;
-        pos += (position - temp)*0.3;
+        pos += (position - temp) * drag;
 
         gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
     }
@@ -132,9 +132,17 @@ renderContext state (Context c) me = do
     Renderer.render c.renderer c.scene c.camera
 
 
-onMouseMove :: forall eff. RefVal StateRef -> Number -> Number -> Eff (ref :: Ref, trace :: Trace, dom :: DOM | eff) Unit
-onMouseMove state x y = do
-    modifyRef state $ \(StateRef s) -> stateRef s.frame (pos x y) s.pos
+onMouseMove :: forall eff. Context -> RefVal StateRef -> Event -> Eff (three :: Three, ref :: Ref, trace :: Trace, dom :: DOM | eff) Unit
+onMouseMove (Context c) state e = do
+    canvas <- getElementsByTagName "canvas"
+    dims   <- nodeDimensions canvas
+
+    let x =  e.x - (dims.width/2)
+        y = -e.y + (dims.height/2)
+
+    modifyRef state $ \(StateRef s) -> 
+        stateRef s.frame (pos x y) s.pos
+
     return unit
 
 main = do
@@ -150,26 +158,8 @@ main = do
 
     Scene.addMesh c.scene mesh
 
-    mouseMove $ onMouseMove state
+    canvas <- getElementsByTagName "canvas"
+    addEventListener canvas "mousemove" $ onMouseMove ctx state
+
     doAnimation $ renderContext state ctx mesh
-
-
-foreign import mouseMove """
-    function mouseMove(handler) {
-        return function () {
-            var node = document.getElementsByTagName('canvas')[0];
-
-            node.addEventListener('mousemove', function(e) {
-                var rect = node.getBoundingClientRect(),
-                    x    = (e.x - rect.left) - rect.width/2,
-                    y    = - (e.y - rect.top) + rect.height/2;
-
-                    //x =   (e.clientX / rect.width ) * 2 - 1
-                    //y = - (e.clientY / rect.height ) * 2 + 1
-
-                handler(x)(y)();
-            });
-        };
-    }
-""" :: forall eff. (Number -> Number -> Eff (dom :: DOM | eff) Unit) -> Eff (dom :: DOM | eff) Unit
 

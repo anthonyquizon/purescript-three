@@ -24,7 +24,12 @@ newtype Context = Context {
         , camera   :: Camera.Camera
     }
 
-type WindowDims = {
+type Event = {
+          x :: Number
+        , y :: Number
+    }
+
+type Dimensions = {
         width :: Number 
       , height :: Number
     }
@@ -49,44 +54,72 @@ doAnimation animate = do
     animate
     requestAnimationFrame $ doAnimation animate
 
-onResize :: forall eff. Context -> Eff (three :: Three | eff) Unit
-onResize (Context c) = do
-    win <- windowDimensions
+onResize :: forall eff. Context -> Event -> Eff (dom :: DOM, three :: Three | eff) Unit
+onResize (Context c) _ = do
+    window   <- getWindow
+    dims     <- nodeDimensions window
 
---    windowHalfX = window.innerWidth / 2;
---    windowHalfY = window.innerHeight / 2;
-    Camera.setAspect c.camera $ win.width / win.height
+    Camera.updateOrthographic c.camera (dims.width/(-2)) 
+                                       (dims.width/(2)) 
+                                       (dims.height/2) 
+                                       (dims.height/(-2))
+
     Camera.updateProjectionMatrix c.camera
 
-    Renderer.setSize c.renderer win.width win.height
+    Renderer.setSize c.renderer dims.width dims.height
 
 
 init :: forall eff. Eff (trace :: Trace, dom :: DOM, three :: Three | eff) Context
 init = do
-    win      <- windowDimensions
+    window   <- getWindow
+    dims     <- nodeDimensions window
     renderer <- Renderer.createWebGL {antialias: true}
     scene    <- Scene.create
-    camera   <- Camera.createPerspective 45 (win.width/win.height) 1 1000
+
+    let aspect   = dims.width / dims.height
+        viewsize = 1000
+        
+    camera   <- Camera.createOrthographic (dims.width/(-2)) 
+                                          (dims.width/(2)) 
+                                          (dims.height/2) 
+                                          (dims.height/(-2)) 
+                                          1 1000
 
     let ctx = context renderer scene camera
 
     Scene.addCamera scene camera
-    Renderer.setSize renderer win.width win.height
+    Renderer.setSize renderer dims.width dims.height
     Renderer.appendToDomByID renderer "container"
     Camera.posZ camera 500
 
-    print win.width
-    print win.height
-
-    addEventListener "resize" $ onResize ctx
+    addEventListener window "resize" $ onResize ctx
     return ctx
     
 
-windowDimensions :: forall eff. Eff eff WindowDims
-windowDimensions = ffi [""] "{ width: window.innerWidth, height: window.innerHeight }"
 
-addEventListener :: forall eff. String -> Eff eff Unit -> Eff eff Unit
-addEventListener = fpi ["name","callback", ""] "window.addEventListener(name, callback)"
+unsafePrint :: forall eff a. a -> Eff eff Unit
+unsafePrint = fpi ["a", ""] "console.log(a)"
+
+getWindow :: forall eff. Eff (dom :: DOM | eff) Node
+getWindow = ffi [""] "window"
+
+getElementsByTagName :: forall eff. String -> Eff (dom :: DOM | eff) Node
+getElementsByTagName = ffi ["name", ""] "document.getElementsByTagName(name)[0]"
+
+nodeDimensions :: forall eff. Node -> Eff eff Dimensions
+nodeDimensions = ffi ["node", ""]
+    """ { 
+            width: node.innerWidth ? node.innerWidth : node.width, 
+            height: node.innerHeight ? node.innerHeight : node.height
+        }
+    """
+
+addEventListener :: forall eff1 eff2. Node -> String -> (Event -> Eff eff1 Unit) -> Eff (dom :: DOM | eff2) Unit
+addEventListener = fpi ["node", "name", "callback", ""] 
+    """ node.addEventListener(name, function(e) {
+            callback(e)();
+        })
+    """
 
 requestAnimationFrame :: forall eff. Eff eff Unit -> Eff eff Unit
 requestAnimationFrame = fpi ["callback", ""] "window.requestAnimationFrame(callback)"
