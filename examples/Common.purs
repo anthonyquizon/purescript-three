@@ -2,6 +2,7 @@ module Examples.Common where
 
 import           Control.Monad.Eff
 import           Control.Monad.Eff.Ref
+import           Data.Array
 import           DOM
 import qualified Graphics.Three.Renderer    as Renderer
 import qualified Graphics.Three.Material    as Material
@@ -49,6 +50,48 @@ newtype ContextState eff a = ContextState (StateT Context (Eff (three :: Three |
 runContextState :: forall eff a. ContextState eff a -> Context -> (Eff (three :: Three | eff)) a
 runContextState (ContextState ctxState) c = evalStateT ctxState c
 
+newtype Pos = Pos {
+          x :: Number
+        , y :: Number
+    }
+
+pos :: Number -> Number -> Pos
+pos x y = Pos {
+          x: x
+        , y: y
+    }
+
+instance showPos :: Show Pos where
+    show (Pos p) = 
+        "x: " ++ show p.x ++ ", y: " ++ show p.y
+
+newtype StateRef = StateRef {
+          frame :: Number
+        , pos   :: Pos
+        , prev  :: Pos
+    }
+
+instance showStateRef :: Show StateRef where
+    show (StateRef s) = 
+        "frame: " ++ show s.frame ++ "\n" ++
+        "pos: "   ++ show s.pos   ++ "\n" ++
+        "prev: "  ++ show s.prev  ++ "\n"
+
+stateRef :: Number -> Pos -> Pos -> StateRef
+stateRef f p pv = StateRef {
+          frame: f
+        , pos: p
+        , prev: pv
+    }
+
+initStateRef :: StateRef
+initStateRef = stateRef 0 nPos nPos
+    where
+        nPos = pos 0 0
+
+gridList :: forall a. Number -> Number -> (Number -> Number -> a) -> [a]
+gridList n m f = concatMap (\i -> map (\j -> f i j) (0..m)) (0..n)
+
 doAnimation :: forall eff. Eff (three :: Three | eff) Unit -> Eff (three :: Three | eff) Unit
 doAnimation animate = do
     animate
@@ -69,8 +112,8 @@ onResize (Context c) _ = do
     Renderer.setSize c.renderer dims.width dims.height
 
 
-init :: forall eff. Eff (trace :: Trace, dom :: DOM, three :: Three | eff) Context
-init = do
+initContext :: forall eff. Eff (trace :: Trace, dom :: DOM, three :: Three | eff) Context
+initContext = do
     window   <- getWindow
     dims     <- nodeDimensions window
     renderer <- Renderer.createWebGL {antialias: true}

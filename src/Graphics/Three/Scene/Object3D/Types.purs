@@ -8,5 +8,5 @@ import Control.Monad.Eff
 
 class Object3D a where
     getPosition :: forall eff. a -> Eff (three :: Three | eff) Vector3 
-    setPosition :: forall eff. a -> Number -> Number -> Number -> Eff (three :: Three | eff) Vector3
+    setPosition :: forall eff. a -> Number -> Number -> Number -> Eff (three :: Three | eff) Unit
 

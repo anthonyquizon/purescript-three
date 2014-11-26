@@ -19,39 +19,6 @@ import Examples.Common
 
 radius = 40.0
 
-newtype Pos = Pos {
-          x :: Number
-        , y :: Number
-    }
-
-pos :: Number -> Number -> Pos
-pos x y = Pos {
-          x: x
-        , y: y
-    }
-
-instance showPos :: Show Pos where
-    show (Pos p) = 
-        "x: " ++ show p.x ++ ", y: " ++ show p.y
-
-newtype StateRef = StateRef {
-          frame :: Number
-        , pos   :: Pos
-        , prev  :: Pos
-    }
-
-instance showStateRef :: Show StateRef where
-    show (StateRef s) = 
-        "frame: " ++ show s.frame ++ "\n" ++
-        "pos: "   ++ show s.pos   ++ "\n" ++
-        "prev: "  ++ show s.prev  ++ "\n"
-
-stateRef :: Number -> Pos -> Pos -> StateRef
-stateRef f p pv = StateRef {
-          frame: f
-        , pos: p
-        , prev: pv
-    }
 
 initUniforms = {
         delta: {
@@ -102,10 +69,6 @@ fragmentShader = """
 
 
 
-initStateRef :: StateRef
-initStateRef = stateRef 0 nPos nPos
-    where
-        nPos = pos 0 0
 
 shapeMotion :: forall eff. Mesh.Mesh -> Number -> Pos -> Pos -> Eff (trace :: Trace, three :: Three | eff) Unit
 shapeMotion me f (Pos p1) (Pos p2) = do
@@ -146,7 +109,7 @@ onMouseMove (Context c) state e = do
     return unit
 
 main = do
-    ctx@(Context c) <- init
+    ctx@(Context c) <- initContext
     state           <- newRef initStateRef
     material        <- Material.createShader {
                             uniforms: initUniforms

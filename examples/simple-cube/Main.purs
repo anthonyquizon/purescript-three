@@ -22,7 +22,7 @@ rotateCube (Context c) mesh n = do
     Renderer.render c.renderer c.scene c.camera
 
 main = do
-    ctx@(Context c) <- init
+    ctx@(Context c) <- initContext
     material        <- Material.createMeshBasic {}
     box             <- Geometry.createBox 100 100 100
     cube            <- Mesh.create box material

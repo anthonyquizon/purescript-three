@@ -97,7 +97,7 @@ renderContext frame (Context c) mat = do
     Renderer.render c.renderer c.scene c.camera
 
 main = do
-    ctx@(Context c) <- init
+    ctx@(Context c) <- initContext
     frame           <- newRef 0
     material        <- Material.createShader {
                             uniforms: initUniforms

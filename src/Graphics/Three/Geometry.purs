@@ -25,8 +25,9 @@ createCircle = ffi ["radius", "segments", "thetaStart", "thetaLength", ""]
 createPlane :: forall eff. Number -> 
                            Number -> 
                            Number -> 
+                           Number -> 
                            Eff (three :: Three | eff) Geometry
-createPlane = ffi ["width", "height", "length", "thetaLength", ""] 
-    "new THREE.PlaneGeometry(width, height, length);"
+createPlane = ffi ["width", "height", "widthSegment", "heightSegment", ""] 
+    "new THREE.PlaneGeometry(width, height, widthSegment, heightSegment);"
 
 
