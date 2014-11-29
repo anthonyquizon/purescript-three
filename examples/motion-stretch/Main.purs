@@ -9,9 +9,8 @@ import qualified Graphics.Three.Renderer    as Renderer
 import qualified Graphics.Three.Scene       as Scene
 import qualified Graphics.Three.Material    as Material
 import qualified Graphics.Three.Geometry    as Geometry
-import qualified Graphics.Three.Scene.Camera      as Camera
-import qualified Graphics.Three.Scene.Mesh as Mesh
-import qualified Graphics.Three.Scene.Object3D as Object3D
+import qualified Graphics.Three.Camera      as Camera
+import qualified Graphics.Three.Object3D    as Object3D
 import qualified Graphics.Three.Math.Vector as Vector
 import           Graphics.Three.Types     
 
@@ -70,9 +69,9 @@ fragmentShader = """
 
 
 
-shapeMotion :: forall eff. Mesh.Mesh -> Number -> Pos -> Pos -> Eff (trace :: Trace, three :: Three | eff) Unit
+shapeMotion :: forall eff. Object3D.Mesh -> Number -> Pos -> Pos -> Eff (trace :: Trace, three :: Three | eff) Unit
 shapeMotion me f (Pos p1) (Pos p2) = do
-    mat <- Mesh.getMaterial me
+    mat <- Object3D.getMaterial me
 
     Object3D.setPosition me p1.x p1.y 0
     Material.setUniform mat "delta" $ Vector.createVec3 dx dy 0
@@ -82,8 +81,7 @@ shapeMotion me f (Pos p1) (Pos p2) = do
         dx = p2.x - p1.x
         dy = p2.y - p1.y
 
-
-renderContext :: forall eff. RefVal StateRef -> Context -> Mesh.Mesh ->
+renderContext :: forall eff. RefVal StateRef -> Context -> Object3D.Mesh ->
                  Eff ( trace :: Trace, ref :: Ref, three :: Three | eff) Unit
 renderContext state (Context c) me = do
     
@@ -117,9 +115,9 @@ main = do
                             , fragmentShader: fragmentShader
                         }
     circle          <- Geometry.createCircle radius 32 0 (2*Math.pi)
-    mesh            <- Mesh.create circle material
+    mesh            <- Object3D.createMesh circle material
 
-    Scene.addMesh c.scene mesh
+    Scene.add c.scene mesh
 
     canvas <- getElementsByTagName "canvas"
     addEventListener canvas "mousemove" $ onMouseMove ctx state

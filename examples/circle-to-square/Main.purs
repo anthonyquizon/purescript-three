@@ -3,14 +3,14 @@ module Main where
 import           Control.Monad.Eff
 import           Control.Monad.Eff.Ref
 import           DOM
-import qualified Graphics.Three.Renderer    as Renderer
-import qualified Graphics.Three.Material    as Material
-import qualified Graphics.Three.Geometry    as Geometry
-import qualified Graphics.Three.Scene       as Scene
-import qualified Graphics.Three.Scene.Camera      as Camera
-import qualified Graphics.Three.Scene.Mesh as Mesh
+import qualified Graphics.Three.Camera   as Camera
+import qualified Graphics.Three.Material as Material
+import qualified Graphics.Three.Object3D as Object3D
+import qualified Graphics.Three.Geometry as Geometry
+import qualified Graphics.Three.Renderer as Renderer
+import qualified Graphics.Three.Scene    as Scene
 import           Graphics.Three.Types     
-import qualified Math           as Math
+import qualified Math                    as Math
 
 import Examples.Common
 import Debug.Trace
@@ -105,9 +105,9 @@ main = do
                             , fragmentShader: fragmentShader
                         }
     circle          <- Geometry.createCircle radius 32 0 (2*Math.pi)
-    mesh            <- Mesh.create circle material
+    mesh            <- Object3D.createMesh circle material
 
-    Scene.addMesh c.scene mesh
+    Scene.add c.scene mesh
 
     doAnimation $ renderContext frame ctx material
 
