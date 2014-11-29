@@ -2,8 +2,8 @@ module Graphics.Three.Scene where
 
 import           Control.Monad.Eff
 import           Data.Function
-import qualified Graphics.Three.Scene.Object3D.Camera as Cam --TODO should use import .. (Camera)
-import qualified Graphics.Three.Scene.Object3D.Mesh as Me -- TODO should use import .. (Mesh)
+import qualified Graphics.Three.Scene.Camera as Cam --TODO should use import .. (Camera)
+import qualified Graphics.Three.Scene.Mesh as Me -- TODO should use import .. (Mesh)
 import           Graphics.Three.Types
 import           Graphics.Three.Util
 

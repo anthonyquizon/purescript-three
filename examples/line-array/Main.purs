@@ -8,10 +8,10 @@ import qualified Graphics.Three.Renderer    as Renderer
 import qualified Graphics.Three.Material    as Material
 import qualified Graphics.Three.Geometry    as Geometry
 import qualified Graphics.Three.Scene       as Scene
-import qualified Graphics.Three.Scene.Object3D.Camera      as Camera
-import qualified Graphics.Three.Scene.Object3D.Mesh as Mesh
+import qualified Graphics.Three.Scene.Camera      as Camera
+import qualified Graphics.Three.Scene.Mesh as Mesh
 import           Graphics.Three.Types     
-import qualified Graphics.Three.Scene.Object3D.Types as ObjectTypes
+import qualified Graphics.Three.Scene.Object3D as Object3D
 import qualified Math           as Math
 
 import Examples.Common
@@ -75,7 +75,7 @@ createMesh dims scene mat colWidth rowHeight acc (Pos p) = do
     plane <- Geometry.createPlane w h 1 1
     mesh  <- Mesh.create plane mat
 
-    ObjectTypes.setPosition mesh x y 0
+    Object3D.setPosition mesh x y 0
     Scene.addMesh scene mesh
 
     return $ mesh:acc

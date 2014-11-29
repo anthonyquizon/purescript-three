@@ -9,9 +9,9 @@ import qualified Graphics.Three.Renderer    as Renderer
 import qualified Graphics.Three.Scene       as Scene
 import qualified Graphics.Three.Material    as Material
 import qualified Graphics.Three.Geometry    as Geometry
-import qualified Graphics.Three.Scene.Object3D.Camera      as Camera
-import qualified Graphics.Three.Scene.Object3D.Mesh as Mesh
-import qualified Graphics.Three.Scene.Object3D.Types as ObjectTypes
+import qualified Graphics.Three.Scene.Camera      as Camera
+import qualified Graphics.Three.Scene.Mesh as Mesh
+import qualified Graphics.Three.Scene.Object3D as Object3D
 import qualified Graphics.Three.Math.Vector as Vector
 import           Graphics.Three.Types     
 
@@ -74,7 +74,7 @@ shapeMotion :: forall eff. Mesh.Mesh -> Number -> Pos -> Pos -> Eff (trace :: Tr
 shapeMotion me f (Pos p1) (Pos p2) = do
     mat <- Mesh.getMaterial me
 
-    ObjectTypes.setPosition me p1.x p1.y 0
+    Object3D.setPosition me p1.x p1.y 0
     Material.setUniform mat "delta" $ Vector.createVec3 dx dy 0
     
     return unit

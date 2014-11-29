@@ -1,10 +1,11 @@
-module Graphics.Three.Scene.Object3D.Camera where
+module Graphics.Three.Scene.Camera where
 
 import Control.Monad.Eff
 import Data.Function
 import Graphics.Three.Types
 import Graphics.Three.Util
 import Graphics.Three.Math.Vector
+import           Graphics.Three.Scene.Object3D
 
 foreign import data Camera :: *
 
