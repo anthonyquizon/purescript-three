@@ -20,9 +20,7 @@
     "tests"
   ],
   "dependencies": {
-    "threejs": "*"
-  },
-  "devDependencies": {
+    "threejs": "*",
     "purescript-foreign": "*",
     "purescript-easy-ffi": "*",
     "purescript-dom": "*",
