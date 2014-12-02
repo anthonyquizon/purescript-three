@@ -16,8 +16,6 @@ foreign import data Line :: *
 class Object3D a where
     getPosition :: a -> ThreeEff Vector3 
     setPosition :: a -> Number -> Number -> Number -> ThreeEff Unit
-    getGeometry :: a -> ThreeEff G.Geometry
-    getMaterial :: a -> ThreeEff M.Material
     {--getRotationEuler :: forall eff. a -> Number -> Number -> Number -> Eff (three :: Three | eff) --}
     {--setRotationEuler :: forall eff. a -> Number -> Number -> Number -> Eff (three :: Three | eff) Unit--}
     rotateIncrement :: a -> Number -> Number -> Number -> ThreeEff Unit
@@ -25,23 +23,30 @@ class Object3D a where
 instance object3DMesh :: Object3D Mesh where
     getPosition     = unsafeGetPosition
     setPosition     = unsafeSetPosition
-    getGeometry     = unsafeGetGeometry
-    getMaterial     = unsafeGetMaterial
     rotateIncrement = unsafeRotateIncrement
 
 instance object3DLine :: Object3D Line where
     getPosition     = unsafeGetPosition
     setPosition     = unsafeSetPosition
-    getGeometry     = unsafeGetGeometry
-    getMaterial     = unsafeGetMaterial
     rotateIncrement = unsafeRotateIncrement
 
 instance object3DCamera :: Object3D C.Camera where
     getPosition     = unsafeGetPosition
     setPosition     = unsafeSetPosition
+    rotateIncrement = unsafeRotateIncrement
+
+
+class Renderable a where
+    getGeometry :: a -> ThreeEff G.Geometry
+    getMaterial :: a -> ThreeEff M.Material
+
+instance renderableMesh :: Renderable Mesh where
     getGeometry     = unsafeGetGeometry
     getMaterial     = unsafeGetMaterial
-    rotateIncrement = unsafeRotateIncrement
+
+instance renderableLine :: Renderable Line where
+    getGeometry     = unsafeGetGeometry
+    getMaterial     = unsafeGetMaterial
 
 
 data LineType = LineStrip | LinePiece
@@ -49,6 +54,7 @@ data LineType = LineStrip | LinePiece
 instance showLineType :: Show LineType where
     show LineStrip = "LineStrip"
     show LinePiece = "LinePiece"
+
 
 createMesh :: G.Geometry -> M.Material -> ThreeEff Mesh
 createMesh = ffi ["geometry", "material", ""] "new THREE.Mesh(geometry, material)"
