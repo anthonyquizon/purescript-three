@@ -66,10 +66,7 @@ fragmentShader = """
     }
 """
 
-
-
-
-shapeMotion :: forall eff. Object3D.Mesh -> Number -> Pos -> Pos -> Eff (trace :: Trace, three :: Three | eff) Unit
+shapeMotion :: Object3D.Mesh -> Number -> Pos -> Pos -> ThreeEff Unit
 shapeMotion me f (Pos p1) (Pos p2) = do
     mat <- Object3D.getMaterial me
 

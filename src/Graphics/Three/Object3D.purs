@@ -12,11 +12,12 @@ import qualified Graphics.Three.Geometry as G
 foreign import data Mesh :: *
 foreign import data Line :: *
 
+
 class Object3D a where
     getPosition :: a -> ThreeEff Vector3 
     setPosition :: a -> Number -> Number -> Number -> ThreeEff Unit
-    getGeometry :: Mesh -> ThreeEff G.Geometry
-    getMaterial :: Mesh -> ThreeEff M.Material
+    getGeometry :: a -> ThreeEff G.Geometry
+    getMaterial :: a -> ThreeEff M.Material
     {--getRotationEuler :: forall eff. a -> Number -> Number -> Number -> Eff (three :: Three | eff) --}
     {--setRotationEuler :: forall eff. a -> Number -> Number -> Number -> Eff (three :: Three | eff) Unit--}
     rotateIncrement :: a -> Number -> Number -> Number -> ThreeEff Unit
@@ -43,11 +44,19 @@ instance object3DCamera :: Object3D C.Camera where
     rotateIncrement = unsafeRotateIncrement
 
 
-createMesh :: G.Geometry -> M.Material -> ThreeEff Mesh
-createMesh = ffi ["geometry", "material", ""] "new THREE.Mesh(geometry, material);"
+data LineType = LineStrip | LinePiece
 
-createLine :: G.Geometry -> M.Material -> ThreeEff Line
-createLine = ffi ["geometry", "material", ""] "new THREE.Line(geometry, material);"
+instance showLineType :: Show LineType where
+    show LineStrip = "LineStrip"
+    show LinePiece = "LinePiece"
+
+createMesh :: G.Geometry -> M.Material -> ThreeEff Mesh
+createMesh = ffi ["geometry", "material", ""] "new THREE.Mesh(geometry, material)"
+
+createLine :: G.Geometry -> M.Material -> LineType -> ThreeEff Line
+createLine g m t = create g m $ show t
+    where
+        create = ffi ["geometry", "material", "lineType", ""] "new THREE.Line(geometry, material)"
 
 
 unsafeGetPosition = ffi ["object", ""] "object.position"
