@@ -49,11 +49,11 @@ instance renderableLine :: Renderable Line where
     getMaterial     = unsafeGetMaterial
 
 
-data LineType = LineStrip | LinePiece
+data LineType = LineStrip | LinePieces
 
 instance showLineType :: Show LineType where
-    show LineStrip = "LineStrip"
-    show LinePiece = "LinePiece"
+    show LineStrip  = "LineStrip"
+    show LinePieces = "LinePieces"
 
 
 createMesh :: forall a. (M.Material a) => G.Geometry -> a -> ThreeEff Mesh
