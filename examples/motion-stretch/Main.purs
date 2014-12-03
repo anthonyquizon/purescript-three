@@ -114,7 +114,7 @@ main = do
     circle          <- Geometry.createCircle radius 32 0 (2*Math.pi)
     mesh            <- Object3D.createMesh circle material
 
-    Scene.add c.scene mesh
+    Scene.addObject c.scene mesh
 
     canvas <- getElementsByTagName "canvas"
     addEventListener canvas "mousemove" $ onMouseMove ctx state

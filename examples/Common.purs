@@ -128,7 +128,7 @@ initContext = do
 
     let ctx = context renderer scene camera
 
-    Scene.add scene camera
+    Scene.addObject scene camera
     Renderer.setSize renderer dims.width dims.height
     Renderer.appendToDomByID renderer "container"
     Object3D.setPosition camera 0 0 500

@@ -24,7 +24,7 @@ main = do
     box             <- Geometry.createBox 100 100 100
     cube            <- Object3D.createMesh box material
 
-    Scene.add c.scene cube
+    Scene.addObject c.scene cube
 
     doAnimation $ rotateCube ctx cube 0.01
 

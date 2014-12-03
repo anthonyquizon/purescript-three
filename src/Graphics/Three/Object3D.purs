@@ -38,7 +38,7 @@ instance object3DCamera :: Object3D C.Camera where
 
 class Renderable a where
     getGeometry :: a -> ThreeEff G.Geometry
-    getMaterial :: a -> ThreeEff M.Material
+    getMaterial :: forall b. (M.Material b) => a -> ThreeEff b
 
 instance renderableMesh :: Renderable Mesh where
     getGeometry     = unsafeGetGeometry
@@ -56,10 +56,10 @@ instance showLineType :: Show LineType where
     show LinePiece = "LinePiece"
 
 
-createMesh :: G.Geometry -> M.Material -> ThreeEff Mesh
+createMesh :: forall a. (M.Material a) => G.Geometry -> a -> ThreeEff Mesh
 createMesh = ffi ["geometry", "material", ""] "new THREE.Mesh(geometry, material)"
 
-createLine :: G.Geometry -> M.Material -> LineType -> ThreeEff Line
+createLine :: forall a. (M.Material a) => G.Geometry -> a -> LineType -> ThreeEff Line
 createLine g m t = create g m $ show t
     where
         create = ffi ["geometry", "material", "lineType", ""] "new THREE.Line(geometry, material)"

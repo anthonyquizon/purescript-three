@@ -79,13 +79,13 @@ clamp n = Math.min 1.0 $ Math.max (0.0) n
 
 --TODO square wave with ease functions
 
-morphShape :: forall eff. Material.Material -> Number -> Eff (trace :: Trace, three :: Three | eff) Unit
+morphShape :: forall eff. Material.Shader -> Number -> Eff (trace :: Trace, three :: Three | eff) Unit
 morphShape ma n = do
     let a = (Math.sin $ ((2*Math.pi) / interval) * (n % interval)) * 0.5 + 0.5
     Material.setUniform ma "amount" $ clamp a
     return unit
 
-renderContext :: forall a eff. RefVal Number -> Context -> Material.Material ->
+renderContext :: forall eff. RefVal Number -> Context -> Material.Shader ->
                        Eff ( trace :: Trace, ref :: Ref, three :: Three | eff) Unit
 renderContext frame (Context c) mat = do
     
@@ -107,7 +107,7 @@ main = do
     circle          <- Geometry.createCircle radius 32 0 (2*Math.pi)
     mesh            <- Object3D.createMesh circle material
 
-    Scene.add c.scene mesh
+    Scene.addObject c.scene mesh
 
     doAnimation $ renderContext frame ctx material
 

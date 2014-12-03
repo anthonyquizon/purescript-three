@@ -4,23 +4,21 @@ import           Control.Monad
 import           Control.Monad.Eff
 import           Control.Monad.Eff.Ref
 import           DOM
-
 import qualified Graphics.Three.Camera   as Camera
 import qualified Graphics.Three.Geometry as Geometry
 import qualified Graphics.Three.Material as Material
+import qualified Graphics.Three.Renderer   as Renderer
+import qualified Graphics.Three.Scene       as Scene
 import qualified Graphics.Three.Object3D as Object3D
-import qualified Graphics.Three.Renderer as Renderer
-import qualified Graphics.Three.Scene    as Scene
 import           Graphics.Three.Types     
-
-import qualified Math                    as Math
+import qualified Math           as Math
 
 import Examples.Common
 import Debug.Trace
 
 lineProps = {
-          cols   : 30
-        , rows   : 10
+          cols   : 1
+        , rows   : 1
         , padCol : 50
         , padRow : 50
     }
@@ -55,6 +53,8 @@ fragmentShader = """
     }
 """
 
+
+
 renderContext :: forall eff. RefVal StateRef -> Context -> [Object3D.Mesh] ->
                  Eff (trace :: Trace, ref :: Ref, three :: Three | eff) Unit
 renderContext state (Context c) me = do
@@ -66,7 +66,7 @@ renderContext state (Context c) me = do
     Renderer.render c.renderer c.scene c.camera
 
 
-createMesh :: forall eff. Dimensions -> Scene.Scene -> Material.Material -> 
+createMesh :: forall a eff. (Material.Material a) => Dimensions -> Scene.Scene -> a -> 
               Number -> Number -> [Object3D.Mesh] -> Pos -> 
               Eff (three :: Three | eff) [Object3D.Mesh]
 createMesh dims scene mat colWidth rowHeight acc (Pos p) = do
@@ -77,20 +77,20 @@ createMesh dims scene mat colWidth rowHeight acc (Pos p) = do
     mesh  <- Object3D.createMesh plane mat
 
     Object3D.setPosition mesh x y 0
-    Scene.add scene mesh
+    Scene.addObject scene mesh
 
     return $ mesh:acc
     where
         w = colWidth  - lineProps.padCol
         h = rowHeight - lineProps.padRow
 
-createMeshList :: forall eff. Scene.Scene -> Material.Material -> Eff (dom :: DOM, three :: Three | eff) [Object3D.Mesh]
+createMeshList :: forall a eff. (Material.Material a) => Scene.Scene -> a -> Eff (dom :: DOM, three :: Three | eff) [Object3D.Mesh]
 createMeshList scene mat = do
     canvas <- getElementsByTagName "canvas"
     dims   <- nodeDimensions canvas
     
-    let colWidth  = dims.width  / (lineProps.cols + 1)
-        rowHeight = dims.height / (lineProps.rows + 1)
+    let colWidth  = dims.width  / lineProps.cols
+        rowHeight = dims.height / lineProps.rows
         
     let l = gridList lineProps.cols lineProps.rows $ 
             \i j -> pos (i*colWidth) (j*rowHeight)
@@ -106,7 +106,9 @@ main = do
                         , vertexShader:   vertexShader
                         , fragmentShader: fragmentShader
                     }
+
     meshList <- createMeshList c.scene material
 
     doAnimation $ renderContext state ctx meshList
+
 

@@ -8,6 +8,8 @@ import Graphics.Three.Math.Vector
 
 foreign import data Camera :: *
 
+data CameraType = CameraOrthographic | CameraPerspective
+
 createOrthographic:: Number -> Number -> Number -> Number -> Number -> Number -> ThreeEff Camera
 createOrthographic = ffi ["left", "right", "top", "bottom", "near", "far", ""] 
     "new THREE.OrthographicCamera(left, right, top, bottom, near, far)"

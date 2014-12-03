@@ -11,6 +11,6 @@ foreign import data Scene :: *
 create :: ThreeEff Scene
 create = ffi [""] "new THREE.Scene()"
 
-add :: forall a. (Object3D a) => Scene -> a -> ThreeEff Unit
-add = fpi ["scene", "a", ""] "scene.add(a)"
+addObject :: forall a. (Object3D a) => Scene -> a -> ThreeEff Unit
+addObject = fpi ["scene", "a", ""] "scene.add(a)"
 
