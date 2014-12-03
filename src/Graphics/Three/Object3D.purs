@@ -14,26 +14,32 @@ foreign import data Line :: *
 
 
 class Object3D a where
-    getPosition :: a -> ThreeEff Vector3 
-    setPosition :: a -> Number -> Number -> Number -> ThreeEff Unit
-    {--getRotationEuler :: forall eff. a -> Number -> Number -> Number -> Eff (three :: Three | eff) --}
-    {--setRotationEuler :: forall eff. a -> Number -> Number -> Number -> Eff (three :: Three | eff) Unit--}
-    rotateIncrement :: a -> Number -> Number -> Number -> ThreeEff Unit
+    getPosition      :: a -> ThreeEff Vector3 
+    setPosition      :: a -> Number -> Number -> Number -> ThreeEff Unit
+    getRotationEuler :: a -> Number -> Number -> Number -> ThreeEff Euler
+    setRotationEuler :: a -> Number -> Number -> Number -> ThreeEff Unit
+    rotateIncrement  :: a -> Number -> Number -> Number -> ThreeEff Unit
 
 instance object3DMesh :: Object3D Mesh where
-    getPosition     = unsafeGetPosition
-    setPosition     = unsafeSetPosition
-    rotateIncrement = unsafeRotateIncrement
+    getPosition      = unsafeGetPosition
+    setPosition      = unsafeSetPosition
+    getRotationEuler = unsafeGetRotationEuler
+    setRotationEuler = unsafeSetRotationEuler
+    rotateIncrement  = unsafeRotateIncrement
 
 instance object3DLine :: Object3D Line where
-    getPosition     = unsafeGetPosition
-    setPosition     = unsafeSetPosition
-    rotateIncrement = unsafeRotateIncrement
+    getPosition      = unsafeGetPosition
+    setPosition      = unsafeSetPosition
+    getRotationEuler = unsafeGetRotationEuler
+    setRotationEuler = unsafeSetRotationEuler
+    rotateIncrement  = unsafeRotateIncrement
 
 instance object3DCamera :: Object3D C.Camera where
-    getPosition     = unsafeGetPosition
-    setPosition     = unsafeSetPosition
-    rotateIncrement = unsafeRotateIncrement
+    getPosition      = unsafeGetPosition
+    setPosition      = unsafeSetPosition
+    getRotationEuler = unsafeGetRotationEuler
+    setRotationEuler = unsafeSetRotationEuler
+    rotateIncrement  = unsafeRotateIncrement
 
 
 class Renderable a where
@@ -65,10 +71,12 @@ createLine g m t = create g m $ show t
         create = ffi ["geometry", "material", "lineType", ""] "new THREE.Line(geometry, material)"
 
 
-unsafeGetPosition = ffi ["object", ""] "object.position"
-unsafeSetPosition = fpi ["object", "x", "y", "z", ""] "object.position.set(x, y, z)"
-unsafeGetGeometry = ffi ["object", ""] "object.geometry"
-unsafeGetMaterial = ffi ["object", ""] "object.material"
-unsafeRotateIncrement = fpi ["object", "x", "y", "z", ""] 
+unsafeGetPosition      = ffi ["object", ""] "object.position"
+unsafeSetPosition      = fpi ["object", "x", "y", "z", ""] "object.position.set(x, y, z)" --TODO change to vector?
+unsafeGetRotationEuler = ffi ["object", ""] "object.rotation"
+unsafeSetRotationEuler = fpi ["object", "x", "y", "z", ""] "object.rotation.set(x, y, z)" --TODO change to euler? Add order
+unsafeGetGeometry      = ffi ["object", ""] "object.geometry"
+unsafeGetMaterial      = ffi ["object", ""] "object.material"
+unsafeRotateIncrement  = fpi ["object", "x", "y", "z", ""] 
     "object.rotation.x += x; object.rotation.y += y; object.rotation.z += z;"
 
