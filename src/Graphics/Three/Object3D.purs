@@ -1,6 +1,7 @@
 module Graphics.Three.Object3D where
 
 import Graphics.Three.Math.Vector
+import Graphics.Three.Math.Euler
 import Graphics.Three.Types
 import Graphics.Three.Util
 import Control.Monad.Eff
