@@ -18,11 +18,11 @@ import qualified Math           as Math
 
 import Debug.Trace
 
-
-newtype Context = Context {
-          renderer :: Renderer.Renderer 
-        , scene    :: Scene.Scene
-        , camera   :: Camera.Camera
+data Context = Context {
+          renderer  :: Renderer.Renderer 
+        , scene     :: Scene.Scene
+        , camera    :: Camera.CameraInstance
+        --TODO objects
     }
 
 type Event = {
@@ -37,18 +37,13 @@ type Dimensions = {
 
 context :: Renderer.Renderer -> 
            Scene.Scene -> 
-           Camera.Camera -> 
+           Camera.CameraInstance -> 
            Context
 context r s c = Context {
           renderer: r
         , scene:    s
         , camera:   c
     }
-
-newtype ContextState eff a = ContextState (StateT Context (Eff (three :: Three | eff)) a)
-
-runContextState :: forall eff a. ContextState eff a -> Context -> (Eff (three :: Three | eff)) a
-runContextState (ContextState ctxState) c = evalStateT ctxState c
 
 newtype Pos = Pos {
           x :: Number
@@ -97,41 +92,62 @@ doAnimation animate = do
     animate
     requestAnimationFrame $ doAnimation animate
 
+updateCamera :: Camera.CameraInstance -> Dimensions -> ThreeEff Unit
+updateCamera (Camera.PerspectiveInstance camera) dims = do
+    Camera.setAspect camera $ dims.width / dims.height 
+    Camera.updateProjectionMatrix camera
+
+updateCamera (Camera.OrthographicInstance camera) dims = do
+    Camera.updateOrthographic camera (dims.width/(-2)) (dims.width/(2)) 
+                                     (dims.height/2)   (dims.height/(-2))--}
+    Camera.updateProjectionMatrix camera
+
+renderContext :: forall eff. Context -> ThreeEffN eff Unit
+renderContext (Context c) = do
+    case c.camera of
+        Camera.PerspectiveInstance camera  -> Renderer.render c.renderer c.scene camera
+        Camera.OrthographicInstance camera -> Renderer.render c.renderer c.scene camera
+
 onResize :: forall eff. Context -> Event -> Eff (dom :: DOM, three :: Three | eff) Unit
 onResize (Context c) _ = do
-    window   <- getWindow
-    dims     <- nodeDimensions window
+    window <- getWindow
+    dims   <- nodeDimensions window
 
-    Camera.updateOrthographic c.camera (dims.width/(-2)) 
-                                       (dims.width/(2)) 
-                                       (dims.height/2) 
-                                       (dims.height/(-2))
+    updateCamera c.camera dims
 
-    Camera.updateProjectionMatrix c.camera
     Renderer.setSize c.renderer dims.width dims.height
 
-initContext :: forall eff. Eff (trace :: Trace, dom :: DOM, three :: Three | eff) Context
-initContext = do
+createCameraInsance :: Camera.CameraType -> Scene.Scene -> Dimensions -> ThreeEff Camera.CameraInstance
+createCameraInsance Camera.Perspective scene dims = do
+    camera <- Camera.createPerspective 45 (dims.width / dims.height) 1 1000
+    setupCamera scene camera
+
+    return $ Camera.PerspectiveInstance camera
+createCameraInsance Camera.Orthographic scene dims = do
+    camera <- Camera.createOrthographic (dims.width/(-2)) (dims.width/(2)) 
+                                        (dims.height/2) (dims.height/(-2)) 
+                                        1 1000
+    setupCamera scene camera
+    return $ Camera.OrthographicInstance camera
+
+setupCamera :: forall a eff. (Object3D.Object3D a, Camera.Camera a) => Scene.Scene -> a -> ThreeEffN eff Unit
+setupCamera scene camera = do
+    Scene.addObject scene camera
+    Object3D.setPosition camera 0 0 500
+    return unit
+
+initContext :: forall eff. Camera.CameraType -> Eff (trace :: Trace, dom :: DOM, three :: Three | eff) Context
+initContext cameraType = do
     window   <- getWindow
     dims     <- nodeDimensions window
     renderer <- Renderer.createWebGL {antialias: true}
     scene    <- Scene.create
-
-    let aspect   = dims.width / dims.height
-        viewsize = 1000
-        
-    camera   <- Camera.createOrthographic (dims.width/(-2)) 
-                                          (dims.width/(2)) 
-                                          (dims.height/2) 
-                                          (dims.height/(-2)) 
-                                          1 1000
+    camera   <- createCameraInsance cameraType scene dims
 
     let ctx = context renderer scene camera
 
-    Scene.addObject scene camera
     Renderer.setSize renderer dims.width dims.height
     Renderer.appendToDomByID renderer "container"
-    Object3D.setPosition camera 0 0 500
 
     addEventListener window "resize" $ onResize ctx
     return ctx

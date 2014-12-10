@@ -19,18 +19,18 @@ import Debug.Trace
 
 v3 = createVec3
 
-renderContext :: forall eff. Context -> Object3D.Line -> Number -> Eff (three :: Three | eff) Unit
-renderContext (Context c) line n = do
+rotateLine :: forall eff. Context -> Object3D.Line -> Number -> Eff (three :: Three | eff) Unit
+rotateLine context line n = do
     Object3D.rotateIncrement line 0 0 n
-    Renderer.render c.renderer c.scene c.camera
+    renderContext context
 
 main = do
-    ctx@(Context c) <- initContext
+    ctx@(Context c) <- initContext Camera.Orthographic
     material        <- Material.createLineBasic { color: "red", linewidth: 10 }
     geometry        <- Geometry.create [v3 0 100 0, v3 0 (-100) 0]
     line            <- Object3D.createLine geometry material Object3D.LineStrip
 
     Scene.addObject c.scene line
 
-    doAnimation $ renderContext ctx line 0.01
+    doAnimation $ rotateLine ctx line 0.01
 

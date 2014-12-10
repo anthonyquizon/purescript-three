@@ -78,16 +78,16 @@ shapeMotion me f (Pos p1) (Pos p2) = do
         dx = p2.x - p1.x
         dy = p2.y - p1.y
 
-renderContext :: forall eff. RefVal StateRef -> Context -> Object3D.Mesh ->
+render :: forall eff. RefVal StateRef -> Context -> Object3D.Mesh ->
                  Eff ( trace :: Trace, ref :: Ref, three :: Three | eff) Unit
-renderContext state (Context c) me = do
+render state context me = do
     
     modifyRef state $ \(StateRef s) -> stateRef (s.frame + 1) s.pos s.prev
     s'@(StateRef s) <- readRef state
 
     shapeMotion me s.frame s.pos s.prev
     
-    Renderer.render c.renderer c.scene c.camera
+    renderContext context
 
 
 onMouseMove :: forall eff. Context -> RefVal StateRef -> Event -> Eff (three :: Three, ref :: Ref, trace :: Trace, dom :: DOM | eff) Unit
@@ -104,7 +104,7 @@ onMouseMove (Context c) state e = do
     return unit
 
 main = do
-    ctx@(Context c) <- initContext
+    ctx@(Context c) <- initContext Camera.Orthographic
     state           <- newRef initStateRef
     material        <- Material.createShader {
                             uniforms: initUniforms
@@ -119,5 +119,5 @@ main = do
     canvas <- getElementsByTagName "canvas"
     addEventListener canvas "mousemove" $ onMouseMove ctx state
 
-    doAnimation $ renderContext state ctx mesh
+    doAnimation $ render state ctx mesh
 

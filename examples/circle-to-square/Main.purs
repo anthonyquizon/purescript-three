@@ -85,19 +85,19 @@ morphShape ma n = do
     Material.setUniform ma "amount" $ clamp a
     return unit
 
-renderContext :: forall eff. RefVal Number -> Context -> Material.Shader ->
+render :: forall eff. RefVal Number -> Context -> Material.Shader ->
                        Eff ( trace :: Trace, ref :: Ref, three :: Three | eff) Unit
-renderContext frame (Context c) mat = do
+render frame context mat = do
     
     modifyRef frame $ \f -> f + 1
     f <- readRef frame
 
     morphShape mat f
 
-    Renderer.render c.renderer c.scene c.camera
+    renderContext context
 
 main = do
-    ctx@(Context c) <- initContext
+    ctx@(Context c) <- initContext Camera.Orthographic
     frame           <- newRef 0
     material        <- Material.createShader {
                             uniforms: initUniforms
@@ -109,5 +109,5 @@ main = do
 
     Scene.addObject c.scene mesh
 
-    doAnimation $ renderContext frame ctx material
+    doAnimation $ render frame ctx material
 

@@ -14,12 +14,12 @@ import Debug.Trace
 
 
 rotateCube :: Context -> Object3D.Mesh -> Number -> ThreeEff Unit
-rotateCube (Context c) mesh n = do
+rotateCube context mesh n = do
     Object3D.rotateIncrement mesh 0 n 0
-    Renderer.render c.renderer c.scene c.camera
+    renderContext context
 
 main = do
-    ctx@(Context c) <- initContext
+    ctx@(Context c) <- initContext Camera.Perspective
     material        <- Material.createMeshBasic {}
     box             <- Geometry.createBox 100 100 100
     cube            <- Object3D.createMesh box material
