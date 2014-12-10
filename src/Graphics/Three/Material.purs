@@ -11,26 +11,11 @@ foreign import data LineDashed  :: *
 foreign import data Shader :: *
 
 
-class Material a where
-    getId      :: a -> ThreeEff Number
-    getName    :: a -> ThreeEff String
-    getOpacity :: a -> ThreeEff Number
+class Material a
 
-instance materialMeshBasic :: Material MeshBasic where
-    getId      = unsafeGetId
-    getName    = unsafeGetName
-    getOpacity = unsafeGetName
-
-instance materialLineBasic :: Material LineBasic where
-    getId      = unsafeGetId
-    getName    = unsafeGetName
-    getOpacity = unsafeGetName
-
-instance materialShader :: Material Shader where
-    getId      = unsafeGetId
-    getName    = unsafeGetName
-    getOpacity = unsafeGetName
-
+instance materialMeshBasic :: Material MeshBasic
+instance materialLineBasic :: Material LineBasic
+instance materialShader :: Material Shader
 
 createMeshBasic :: forall opt. {|opt} -> ThreeEff MeshBasic
 createMeshBasic = ffi ["param", ""] "new THREE.MeshBasicMaterial(param)"
@@ -53,6 +38,12 @@ setUniform = ffi ["material", "key", "value", ""] "material.uniforms[key].value 
 getUniform :: forall opt. Shader -> String -> ThreeEff Number
 getUniform = ffi ["material", "key", ""] "material.uniforms[key].value"
 
-unsafeGetId      = ffi ["material", ""] "material.id"
-unsafeGetName    = ffi ["material", ""] "material.name"
-unsafeGetOpacity = ffi ["material", ""] "material.opacity"
+getId :: forall a. (Material a) => a -> ThreeEff Number
+getId = ffi ["material", ""] "material.id"
+
+getName :: forall a. (Material a) => a -> ThreeEff String
+getName = ffi ["material", ""] "material.name"
+
+getOpacity :: forall a. (Material a) => a -> ThreeEff Number
+getOpacity = ffi ["material", ""] "material.opacity"
+

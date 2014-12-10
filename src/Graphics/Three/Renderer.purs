@@ -3,8 +3,8 @@ module Graphics.Three.Renderer where
 import           Control.Monad.Eff
 import           DOM
 import           Data.Function
-import qualified Graphics.Three.Camera as C
-import qualified Graphics.Three.Scene as S
+import           Graphics.Three.Camera
+import           Graphics.Three.Scene
 import           Graphics.Three.Types
 import           Graphics.Three.Util
 
@@ -16,7 +16,7 @@ createWebGL = ffi ["params", ""] "new THREE.WebGLRenderer(params)"
 setSize :: Renderer -> Number -> Number -> ThreeEff Unit
 setSize = ffi ["renderer", "width", "height", ""] "renderer.setSize(width, height)"
 
-render :: Renderer -> S.Scene -> C.Camera -> ThreeEff Unit
+render :: forall a. (Camera a) => Renderer -> Scene -> a -> ThreeEff Unit
 render = fpi ["renderer", "scene", "camera", ""] "renderer.render(scene, camera)"
 
 domElement :: forall eff. Renderer -> Eff (three :: Three, dom :: DOM | eff) Node
