@@ -78,6 +78,7 @@ gulp.task('build', function() {
 });
 
 gulp.task('examples', function() {
+    //TODO generate examples index.html file
     forExamples(compileExample);
 });
 
