@@ -1,5 +1,6 @@
 module Graphics.Three.Scene where
 
+import Prelude
 import Control.Monad.Eff
 import Data.Function
 import Graphics.Three.Object3D
