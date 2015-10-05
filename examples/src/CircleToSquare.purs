@@ -1,6 +1,8 @@
-module Main where
+module Examples.CircleToSquare where
 
+import           Prelude
 import           Control.Monad.Eff
+import           Control.Monad.Eff.Console
 import           Control.Monad.Eff.Ref
 import           DOM
 import qualified Graphics.Three.Camera   as Camera
@@ -10,13 +12,12 @@ import qualified Graphics.Three.Geometry as Geometry
 import qualified Graphics.Three.Renderer as Renderer
 import qualified Graphics.Three.Scene    as Scene
 import           Graphics.Three.Types     
-import qualified Math                    as Math
+import           Math ((%))
 
-import Examples.Common
-import Debug.Trace
+import           Examples.Common
 
 
-interval = 200
+interval = 200.0
 radius   = 50.0
 
 initUniforms = {
@@ -79,17 +80,17 @@ clamp n = Math.min 1.0 $ Math.max (0.0) n
 
 --TODO square wave with ease functions
 
-morphShape :: forall eff. Material.Shader -> Number -> Eff (trace :: Trace, three :: Three | eff) Unit
+morphShape :: forall eff. Material.Shader -> Number -> Eff (trace :: CONSOLE, three :: Three | eff) Unit
 morphShape ma n = do
-    let a = (Math.sin $ ((2*Math.pi) / interval) * (n % interval)) * 0.5 + 0.5
+    let a = (Math.sin $ ((2.0 * Math.pi) / interval) * (n % interval)) * 0.5 + 0.5
     Material.setUniform ma "amount" $ clamp a
     return unit
 
-render :: forall eff. RefVal Number -> Context -> Material.Shader ->
-                       Eff ( trace :: Trace, ref :: Ref, three :: Three | eff) Unit
+render :: forall eff. Ref Number -> Context -> Material.Shader ->
+                       Eff ( trace :: CONSOLE, ref :: REF, three :: Three | eff) Unit
 render frame context mat = do
     
-    modifyRef frame $ \f -> f + 1
+    modifyRef frame $ \f -> f + 1.0
     f <- readRef frame
 
     morphShape mat f
@@ -98,13 +99,13 @@ render frame context mat = do
 
 main = do
     ctx@(Context c) <- initContext Camera.Orthographic
-    frame           <- newRef 0
+    frame           <- newRef 0.0
     material        <- Material.createShader {
                             uniforms: initUniforms
                             , vertexShader:   vertexShader
                             , fragmentShader: fragmentShader
                         }
-    circle          <- Geometry.createCircle radius 32 0 (2*Math.pi)
+    circle          <- Geometry.createCircle radius 32.0 0.0 (2.0 * Math.pi)
     mesh            <- Object3D.createMesh circle material
 
     Scene.addObject c.scene mesh
