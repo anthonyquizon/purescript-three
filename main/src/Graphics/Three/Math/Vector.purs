@@ -15,12 +15,7 @@ foreign import data Vector4 :: *
     -- vector.x
     -- ...
 
-foreign import createVec3Fn :: forall eff. Fn3 Number Number Number Vector3
-
-createVec3 :: forall eff. Number -> Number -> Number -> Vector3
-createVec3 x y z = runFn3 createVec3Fn x y z
-
-
+foreign import createVec3 :: forall eff. Number -> Number -> Number -> Vector3
 
 --TODO instance
 
