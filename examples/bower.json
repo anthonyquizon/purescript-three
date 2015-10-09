@@ -12,6 +12,6 @@
   ],
   "dependencies": {
     "purescript-console": "^0.1.0",
-    "purescript-three": "../../purescript-three#master"
+    "purescript-three": "../../purescript-three"
   }
 }
