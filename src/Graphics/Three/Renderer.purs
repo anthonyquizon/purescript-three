@@ -1,7 +1,9 @@
 module Graphics.Three.Renderer where
 
+import           Prelude
 import           Control.Monad.Eff
 import           DOM
+import           DOM.Node.Types
 import           Data.Function
 import           Graphics.Three.Camera
 import           Graphics.Three.Scene

@@ -1,5 +1,6 @@
 module Graphics.Three.Object3D where
 
+import Prelude
 import Graphics.Three.Math.Vector
 import Graphics.Three.Math.Euler
 import Graphics.Three.Types

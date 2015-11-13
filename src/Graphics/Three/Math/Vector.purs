@@ -1,5 +1,6 @@
 module Graphics.Three.Math.Vector where
 
+import Prelude
 import Control.Monad.Eff
 import Data.Function
 import Graphics.Three.Types
@@ -14,16 +15,7 @@ foreign import data Vector4 :: *
     -- vector.x
     -- ...
 
-foreign import createVec3Fn """
-    function createVec3Fn(x, y, z) {
-        return new THREE.Vector3(x, y, z);
-    }
-    """ :: forall eff. Fn3 Number Number Number Vector3
-
-createVec3 :: forall eff. Number -> Number -> Number -> Vector3
-createVec3 x y z = runFn3 createVec3Fn x y z
-
-
+foreign import createVec3 :: forall eff. Number -> Number -> Number -> Vector3
 
 --TODO instance
 

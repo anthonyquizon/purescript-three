@@ -1,8 +1,8 @@
-module Main where
+module Examples.MotionStretch where
 
-import Debug.Trace
-
+import           Prelude
 import           Control.Monad.Eff
+import           Control.Monad.Eff.Console
 import           Control.Monad.Eff.Ref
 import           DOM
 import qualified Graphics.Three.Renderer    as Renderer
@@ -22,7 +22,7 @@ radius = 40.0
 initUniforms = {
         delta: {
              "type": "v3"
-            , value: Vector.createVec3 0 0 0
+            , value: Vector.createVec3 0.0 0.0 0.0
         },
         radius: {
              "type" : "f"
@@ -70,19 +70,19 @@ shapeMotion :: Object3D.Mesh -> Number -> Pos -> Pos -> ThreeEff Unit
 shapeMotion me f (Pos p1) (Pos p2) = do
     mat <- Object3D.getMaterial me
 
-    Object3D.setPosition me p1.x p1.y 0
-    Material.setUniform mat "delta" $ Vector.createVec3 dx dy 0
+    Object3D.setPosition me p1.x p1.y 0.0
+    Material.setUniform mat "delta" $ Vector.createVec3 dx dy 0.0
     
     return unit
     where
         dx = p2.x - p1.x
         dy = p2.y - p1.y
 
-render :: forall eff. RefVal StateRef -> Context -> Object3D.Mesh ->
-                 Eff ( trace :: Trace, ref :: Ref, three :: Three | eff) Unit
+render :: forall eff. Ref StateRef -> Context -> Object3D.Mesh ->
+                 Eff ( trace :: CONSOLE, ref :: REF, three :: Three | eff) Unit
 render state context me = do
     
-    modifyRef state $ \(StateRef s) -> stateRef (s.frame + 1) s.pos s.prev
+    modifyRef state $ \(StateRef s) -> stateRef (s.frame + 1.0) s.pos s.prev
     s'@(StateRef s) <- readRef state
 
     shapeMotion me s.frame s.pos s.prev
@@ -90,13 +90,13 @@ render state context me = do
     renderContext context
 
 
-onMouseMove :: forall eff. Context -> RefVal StateRef -> Event -> Eff (three :: Three, ref :: Ref, trace :: Trace, dom :: DOM | eff) Unit
+onMouseMove :: forall eff. Context -> Ref StateRef -> Event -> Eff (three :: Three, ref :: REF, trace :: CONSOLE, dom :: DOM | eff) Unit
 onMouseMove (Context c) state e = do
     canvas <- getElementsByTagName "canvas"
     dims   <- nodeDimensions canvas
 
-    let x =  e.x - (dims.width/2)
-        y = -e.y + (dims.height/2)
+    let x =  e.x - (dims.width / 2.0)
+        y = -e.y + (dims.height / 2.0)
 
     modifyRef state $ \(StateRef s) -> 
         stateRef s.frame (pos x y) s.pos
@@ -111,7 +111,7 @@ main = do
                             , vertexShader:   vertexShader
                             , fragmentShader: fragmentShader
                         }
-    circle          <- Geometry.createCircle radius 32 0 (2*Math.pi)
+    circle          <- Geometry.createCircle radius 32.0 0.0 (2.0 * Math.pi)
     mesh            <- Object3D.createMesh circle material
 
     Scene.addObject c.scene mesh
