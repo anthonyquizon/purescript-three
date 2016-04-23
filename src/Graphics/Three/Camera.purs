@@ -1,5 +1,6 @@
 module Graphics.Three.Camera where
 
+import Prelude
 import Control.Monad.Eff
 import Data.Function
 import Graphics.Three.Types

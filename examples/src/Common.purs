@@ -1,9 +1,12 @@
 module Examples.Common where
 
+import           Prelude
 import           Control.Monad.Eff
+import           Control.Monad.Eff.Console
 import           Control.Monad.Eff.Ref
 import           Data.Array
 import           DOM
+import           DOM.Node.Types
 import qualified Graphics.Three.Renderer as Renderer
 import qualified Graphics.Three.Material as Material
 import qualified Graphics.Three.Geometry as Geometry
@@ -15,8 +18,6 @@ import           Graphics.Three.Types
 import           Control.Monad.State.Trans
 import           Data.Tuple
 import qualified Math           as Math
-
-import Debug.Trace
 
 data Context = Context {
           renderer  :: Renderer.Renderer 
@@ -80,12 +81,12 @@ stateRef f p pv = StateRef {
     }
 
 initStateRef :: StateRef
-initStateRef = stateRef 0 nPos nPos
+initStateRef = stateRef 0.0 nPos nPos
     where
-        nPos = pos 0 0
+        nPos = pos 0.0 0.0
 
-gridList :: forall a. Number -> Number -> (Number -> Number -> a) -> [a]
-gridList n m f = concatMap (\i -> map (\j -> f i j) (0..m-1)) (0..n-1)
+gridList :: forall a. Int -> Int -> (Int -> Int -> a) -> Array a
+gridList n m f = concatMap (\i -> map (\j -> f i j) (0..(m-1))) (0..(n-1))
 
 doAnimation :: forall eff. ThreeEffN eff Unit -> ThreeEffN eff Unit
 doAnimation animate = do
@@ -98,8 +99,8 @@ updateCamera (Camera.PerspectiveInstance camera) dims = do
     Camera.updateProjectionMatrix camera
 
 updateCamera (Camera.OrthographicInstance camera) dims = do
-    Camera.updateOrthographic camera (dims.width/(-2)) (dims.width/(2)) 
-                                     (dims.height/2)   (dims.height/(-2))--}
+    Camera.updateOrthographic camera (dims.width/(-2.0)) (dims.width/(2.0))
+                                     (dims.height/2.0)   (dims.height/(-2.0))--}
     Camera.updateProjectionMatrix camera
 
 renderContext :: forall eff. Context -> ThreeEffN eff Unit
@@ -119,24 +120,24 @@ onResize (Context c) _ = do
 
 createCameraInsance :: Camera.CameraType -> Scene.Scene -> Dimensions -> ThreeEff Camera.CameraInstance
 createCameraInsance Camera.Perspective scene dims = do
-    camera <- Camera.createPerspective 45 (dims.width / dims.height) 1 1000
+    camera <- Camera.createPerspective 45.0 (dims.width / dims.height) 1.0 1000.0
     setupCamera scene camera
 
     return $ Camera.PerspectiveInstance camera
 createCameraInsance Camera.Orthographic scene dims = do
-    camera <- Camera.createOrthographic (dims.width/(-2)) (dims.width/(2)) 
-                                        (dims.height/2) (dims.height/(-2)) 
-                                        1 1000
+    camera <- Camera.createOrthographic (dims.width/(-2.0)) (dims.width/(2.0))
+                                        (dims.height/2.0) (dims.height/(-2.0))
+                                        1.0 1000.0
     setupCamera scene camera
     return $ Camera.OrthographicInstance camera
 
 setupCamera :: forall a eff. (Object3D.Object3D a, Camera.Camera a) => Scene.Scene -> a -> ThreeEffN eff Unit
 setupCamera scene camera = do
     Scene.addObject scene camera
-    Object3D.setPosition camera 0 0 500
+    Object3D.setPosition camera 0.0 0.0 500.0
     return unit
 
-initContext :: forall eff. Camera.CameraType -> Eff (trace :: Trace, dom :: DOM, three :: Three | eff) Context
+initContext :: forall eff. Camera.CameraType -> Eff (trace :: CONSOLE, dom :: DOM, three :: Three | eff) Context
 initContext cameraType = do
     window   <- getWindow
     dims     <- nodeDimensions window
