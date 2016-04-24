@@ -1,12 +1,10 @@
 module Graphics.Three.Camera where
 
-import Prelude
-import Control.Monad.Eff
-import Data.Function
-import Graphics.Three.Types
-import Graphics.Three.Util
-import Graphics.Three.Math.Vector
-import Graphics.Three.Object3D
+import Prelude (Unit)
+import Graphics.Three.Types (ThreeEff)
+import Graphics.Three.Util (fpi, ffi)
+import Graphics.Three.Math.Vector (Vector3)
+import Graphics.Three.Object3D (class Object3D)
 
 foreign import data OrthographicCamera :: *
 foreign import data PerspectiveCamera  :: *

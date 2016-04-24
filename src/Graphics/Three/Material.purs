@@ -1,10 +1,8 @@
 module Graphics.Three.Material where
 
-import Prelude
-import Control.Monad.Eff
-import Data.Function
-import Graphics.Three.Types
-import Graphics.Three.Util
+import Prelude (Unit)
+import Graphics.Three.Types (ThreeEff)
+import Graphics.Three.Util (ffi)
 
 foreign import data MeshBasic   :: *
 foreign import data LineBasic   :: *
@@ -36,7 +34,7 @@ createShaderRaw = ffi ["param", ""] "new THREE.RawShaderMaterial(param)"
 setUniform :: forall a. Shader -> String -> a -> ThreeEff Unit
 setUniform = ffi ["material", "key", "value", ""] "material.uniforms[key].value = value"
 
-getUniform :: forall opt. Shader -> String -> ThreeEff Number
+getUniform :: Shader -> String -> ThreeEff Number
 getUniform = ffi ["material", "key", ""] "material.uniforms[key].value"
 
 getId :: forall a. (Material a) => a -> ThreeEff Number

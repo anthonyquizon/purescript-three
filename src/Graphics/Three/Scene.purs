@@ -1,11 +1,9 @@
 module Graphics.Three.Scene where
 
-import Prelude
-import Control.Monad.Eff
-import Data.Function
-import Graphics.Three.Object3D
-import Graphics.Three.Types
-import Graphics.Three.Util
+import Prelude (Unit)
+import Graphics.Three.Object3D (class Object3D)
+import Graphics.Three.Types (ThreeEff)
+import Graphics.Three.Util (fpi, ffi)
 
 foreign import data Scene :: *
 

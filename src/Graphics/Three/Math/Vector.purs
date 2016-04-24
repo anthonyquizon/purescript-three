@@ -1,11 +1,7 @@
 module Graphics.Three.Math.Vector where
 
-import Prelude
-import Control.Monad.Eff
-import Data.Function
-import Graphics.Three.Types
-import Graphics.Three.Util
-import Data.Function
+import Prelude (class Show)
+import Graphics.Three.Util (ffi)
 
 foreign import data Vector2 :: *
 foreign import data Vector3 :: *
@@ -15,7 +11,7 @@ foreign import data Vector4 :: *
     -- vector.x
     -- ...
 
-foreign import createVec3 :: forall eff. Number -> Number -> Number -> Vector3
+foreign import createVec3 :: Number -> Number -> Number -> Vector3
 
 --TODO instance
 

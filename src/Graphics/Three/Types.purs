@@ -1,6 +1,6 @@
 module Graphics.Three.Types where
 
-import Control.Monad.Eff
+import Control.Monad.Eff (Eff)
 
 foreign import data Three :: !
 
