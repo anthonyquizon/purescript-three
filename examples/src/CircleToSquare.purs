@@ -1,20 +1,20 @@
 module Examples.CircleToSquare where
 
-import           Prelude
-import           Control.Monad.Eff
-import           Control.Monad.Eff.Console
-import           Control.Monad.Eff.Ref
-import           DOM
-import qualified Graphics.Three.Camera   as Camera
-import qualified Graphics.Three.Material as Material
-import qualified Graphics.Three.Object3D as Object3D
-import qualified Graphics.Three.Geometry as Geometry
-import qualified Graphics.Three.Renderer as Renderer
-import qualified Graphics.Three.Scene    as Scene
-import           Graphics.Three.Types     
-import           Math ((%))
+import Prelude
+import Control.Monad.Eff
+import Control.Monad.Eff.Console
+import Control.Monad.Eff.Ref
+import DOM
+import Graphics.Three.Camera   as Camera
+import Graphics.Three.Material as Material
+import Graphics.Three.Object3D as Object3D
+import Graphics.Three.Geometry as Geometry
+import Graphics.Three.Renderer as Renderer
+import Graphics.Three.Scene    as Scene
+import Graphics.Three.Types
+import Math (min, sin, pi, (%))
 
-import           Examples.Common
+import Examples.Common
 
 
 interval = 200.0
@@ -76,15 +76,15 @@ fragmentShader = """
 """
 
 clamp :: Number -> Number
-clamp n = Math.min 1.0 $ Math.max (0.0) n
+clamp n = min 1.0 $ max (0.0) n
 
 --TODO square wave with ease functions
 
 morphShape :: forall eff. Material.Shader -> Number -> Eff (trace :: CONSOLE, three :: Three | eff) Unit
 morphShape ma n = do
-    let a = (Math.sin $ ((2.0 * Math.pi) / interval) * (n % interval)) * 0.5 + 0.5
+    let a = (sin $ ((2.0 * pi) / interval) * (n % interval)) * 0.5 + 0.5
     Material.setUniform ma "amount" $ clamp a
-    return unit
+    pure unit
 
 render :: forall eff. Ref Number -> Context -> Material.Shader ->
                        Eff ( trace :: CONSOLE, ref :: REF, three :: Three | eff) Unit
@@ -105,7 +105,7 @@ main = do
                             , vertexShader:   vertexShader
                             , fragmentShader: fragmentShader
                         }
-    circle          <- Geometry.createCircle radius 32.0 0.0 (2.0 * Math.pi)
+    circle          <- Geometry.createCircle radius 32.0 0.0 (2.0 * pi)
     mesh            <- Object3D.createMesh circle material
 
     Scene.addObject c.scene mesh

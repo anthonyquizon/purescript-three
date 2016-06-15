@@ -1,23 +1,24 @@
 module Examples.Common where
 
-import           Prelude
-import           Control.Monad.Eff
-import           Control.Monad.Eff.Console
-import           Control.Monad.Eff.Ref
-import           Data.Array
-import           DOM
-import           DOM.Node.Types
-import qualified Graphics.Three.Renderer as Renderer
-import qualified Graphics.Three.Material as Material
-import qualified Graphics.Three.Geometry as Geometry
-import qualified Graphics.Three.Scene    as Scene
-import qualified Graphics.Three.Camera   as Camera
-import qualified Graphics.Three.Object3D as Object3D
-import           Graphics.Three.Util
-import           Graphics.Three.Types     
-import           Control.Monad.State.Trans
-import           Data.Tuple
-import qualified Math           as Math
+import Prelude (class Show, Unit, bind, unit, negate, map, pure, show, ($), (/), (-), (<>))
+import Control.Monad.Eff (Eff, Pure)
+import Control.Monad.Eff.Console
+import Control.Monad.Eff.Ref
+
+import Data.Array
+import DOM
+import DOM.Node.Types
+import Graphics.Three.Renderer as Renderer
+import Graphics.Three.Material as Material
+import Graphics.Three.Geometry as Geometry
+import Graphics.Three.Scene    as Scene
+import Graphics.Three.Camera   as Camera
+import Graphics.Three.Object3D as Object3D
+import Graphics.Three.Util
+import Graphics.Three.Types
+import Control.Monad.State.Trans
+import Data.Tuple
+import Math as Math
 
 data Context = Context {
           renderer  :: Renderer.Renderer 
@@ -59,7 +60,7 @@ pos x y = Pos {
 
 instance showPos :: Show Pos where
     show (Pos p) = 
-        "x: " ++ show p.x ++ ", y: " ++ show p.y
+        "x: " <> show p.x <> ", y: " <> show p.y
 
 newtype StateRef = StateRef {
           frame :: Number
@@ -69,9 +70,9 @@ newtype StateRef = StateRef {
 
 instance showStateRef :: Show StateRef where
     show (StateRef s) = 
-        "frame: " ++ show s.frame ++ "\n" ++
-        "pos: "   ++ show s.pos   ++ "\n" ++
-        "prev: "  ++ show s.prev  ++ "\n"
+        "frame: " <> show s.frame <> "\n" <>
+        "pos: "   <> show s.pos   <> "\n" <>
+        "prev: "  <> show s.prev  <> "\n"
 
 stateRef :: Number -> Pos -> Pos -> StateRef
 stateRef f p pv = StateRef {
@@ -122,20 +123,19 @@ createCameraInsance :: Camera.CameraType -> Scene.Scene -> Dimensions -> ThreeEf
 createCameraInsance Camera.Perspective scene dims = do
     camera <- Camera.createPerspective 45.0 (dims.width / dims.height) 1.0 1000.0
     setupCamera scene camera
+    pure $ Camera.PerspectiveInstance camera
 
-    return $ Camera.PerspectiveInstance camera
 createCameraInsance Camera.Orthographic scene dims = do
     camera <- Camera.createOrthographic (dims.width/(-2.0)) (dims.width/(2.0))
                                         (dims.height/2.0) (dims.height/(-2.0))
                                         1.0 1000.0
     setupCamera scene camera
-    return $ Camera.OrthographicInstance camera
+    pure $ Camera.OrthographicInstance camera
 
 setupCamera :: forall a eff. (Object3D.Object3D a, Camera.Camera a) => Scene.Scene -> a -> ThreeEffN eff Unit
 setupCamera scene camera = do
     Scene.addObject scene camera
     Object3D.setPosition camera 0.0 0.0 500.0
-    return unit
 
 initContext :: forall eff. Camera.CameraType -> Eff (trace :: CONSOLE, dom :: DOM, three :: Three | eff) Context
 initContext cameraType = do
@@ -151,7 +151,7 @@ initContext cameraType = do
     Renderer.appendToDomByID renderer "container"
 
     addEventListener window "resize" $ onResize ctx
-    return ctx
+    pure ctx
     
 
 

@@ -1,18 +1,19 @@
 module Examples.MotionStretch where
 
-import           Prelude
-import           Control.Monad.Eff
-import           Control.Monad.Eff.Console
-import           Control.Monad.Eff.Ref
-import           DOM
-import qualified Graphics.Three.Renderer    as Renderer
-import qualified Graphics.Three.Scene       as Scene
-import qualified Graphics.Three.Material    as Material
-import qualified Graphics.Three.Geometry    as Geometry
-import qualified Graphics.Three.Camera      as Camera
-import qualified Graphics.Three.Object3D    as Object3D
-import qualified Graphics.Three.Math.Vector as Vector
-import           Graphics.Three.Types     
+import Prelude
+import Control.Monad.Eff
+import Control.Monad.Eff.Console
+import Control.Monad.Eff.Ref
+import DOM
+import Graphics.Three.Renderer    as Renderer
+import Graphics.Three.Scene       as Scene
+import Graphics.Three.Material    as Material
+import Graphics.Three.Geometry    as Geometry
+import Graphics.Three.Camera      as Camera
+import Graphics.Three.Object3D    as Object3D
+import Graphics.Three.Math.Vector as Vector
+import Graphics.Three.Types
+import Math (pi)
 
 import Examples.Common
 
@@ -73,7 +74,7 @@ shapeMotion me f (Pos p1) (Pos p2) = do
     Object3D.setPosition me p1.x p1.y 0.0
     Material.setUniform mat "delta" $ Vector.createVec3 dx dy 0.0
     
-    return unit
+    pure unit
     where
         dx = p2.x - p1.x
         dy = p2.y - p1.y
@@ -101,7 +102,7 @@ onMouseMove (Context c) state e = do
     modifyRef state $ \(StateRef s) -> 
         stateRef s.frame (pos x y) s.pos
 
-    return unit
+    pure unit
 
 main = do
     ctx@(Context c) <- initContext Camera.Orthographic
@@ -111,7 +112,7 @@ main = do
                             , vertexShader:   vertexShader
                             , fragmentShader: fragmentShader
                         }
-    circle          <- Geometry.createCircle radius 32.0 0.0 (2.0 * Math.pi)
+    circle          <- Geometry.createCircle radius 32.0 0.0 (2.0 * pi)
     mesh            <- Object3D.createMesh circle material
 
     Scene.addObject c.scene mesh

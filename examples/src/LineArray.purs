@@ -1,24 +1,25 @@
 module Examples.LineArray where
 
-import           Prelude
-import           Control.Monad
-import           Control.Monad.Eff
-import           Control.Monad.Eff.Console
-import           Control.Monad.Eff.Ref
-import           Data.Array
-import           DOM
-import qualified Graphics.Three.Camera      as Camera
-import qualified Graphics.Three.Geometry    as Geometry
-import qualified Graphics.Three.Material    as Material
-import qualified Graphics.Three.Renderer    as Renderer
-import qualified Graphics.Three.Scene       as Scene
-import qualified Graphics.Three.Object3D    as Object3D
-import           Graphics.Three.Math.Vector
-import           Graphics.Three.Types
-import qualified Data.Int                   as Int
-import qualified Math           as Math
+import Prelude (Unit, ($), bind, (*), (/), pure, negate, (+), (-))
+import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Console (CONSOLE)
+import Control.Monad.Eff.Ref (REF, Ref, newRef, readRef, modifyRef)
+import Data.Array (foldM, (:))
+import DOM (DOM)
+import Graphics.Three.Camera      as Camera
+import Graphics.Three.Geometry    as Geometry
+import Graphics.Three.Material    as Material
+import Graphics.Three.Renderer    as Renderer
+import Graphics.Three.Scene       as Scene
+import Graphics.Three.Object3D    as Object3D
+import Graphics.Three.Math.Vector (createVec3)
+import Graphics.Three.Types (Three)
+import Data.Int                   as Int
+import Math                       as Math
 
-import Examples.Common
+import Examples.Common (Dimensions, Context(Context), Pos(Pos), StateRef(StateRef), doAnimation, initStateRef,
+    initContext, pos, gridList, nodeDimensions, getElementsByTagName, renderContext, stateRef)
+
 
 lineProps = {
           cols   : 30
@@ -28,6 +29,7 @@ lineProps = {
         , radius : 20.0 -- influence radius
     }
 
+initUniforms :: { amount :: { "type" :: String, value :: Number } }
 initUniforms = {
         amount: {
              "type" : "f"
@@ -88,7 +90,7 @@ createLine dims scene mat colWidth rowHeight acc (Pos p) = do
     Object3D.setPosition line x y 0.0
     Scene.addObject scene line
 
-    return $ line:acc
+    pure $ line:acc
     where
         w = colWidth  - lineProps.padCol
         h = rowHeight - lineProps.padRow
@@ -106,7 +108,7 @@ createLineList scene mat = do
             
     foldM (createLine dims scene mat colWidth rowHeight) [] l
 
-
+main :: forall eff.Eff( trace :: CONSOLE, dom :: DOM, three :: Three, ref :: REF | eff) Unit
 main = do
     ctx@(Context c) <- initContext Camera.Orthographic
     state           <- newRef initStateRef
