@@ -1,7 +1,7 @@
 module Examples.MotionStretch where
 
 import Prelude
-import Control.Monad.Eff
+import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console
 import Control.Monad.Eff.Ref
 import DOM
@@ -19,7 +19,10 @@ import Examples.Common
 
 radius = 40.0
 
-
+initUniforms ::  { delta :: { "type" :: String, value :: Vector.Vector3 }
+                 , radius :: { "type" :: String, value :: Number }
+                 , drag :: { "type" :: String, value :: Number }
+                 }
 initUniforms = {
         delta: {
              "type": "v3"
@@ -104,6 +107,7 @@ onMouseMove (Context c) state e = do
 
     pure unit
 
+main :: forall eff.Eff(trace :: CONSOLE, dom :: DOM, three :: Three, ref :: REF | eff) Unit
 main = do
     ctx@(Context c) <- initContext Camera.Orthographic
     state           <- newRef initStateRef
