@@ -1,10 +1,8 @@
 module Graphics.Three.Geometry where
 
-import           Control.Monad.Eff
-import           Data.Function
-import           Graphics.Three.Types
-import           Graphics.Three.Util
-import           Graphics.Three.Math.Vector
+import           Graphics.Three.Types (ThreeEff)
+import           Graphics.Three.Util (fpi, ffi)
+import           Graphics.Three.Math.Vector (Vector3)
 
 foreign import data Geometry :: *
 

@@ -5,4 +5,5 @@ build/
 examples/**/output/*.js
 .psci
 .psci_modules/
+.browserify-cache.json
 output

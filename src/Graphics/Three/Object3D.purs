@@ -1,14 +1,13 @@
 module Graphics.Three.Object3D where
 
-import Prelude
-import Graphics.Three.Math.Vector
-import Graphics.Three.Math.Euler
-import Graphics.Three.Types
-import Graphics.Three.Util
-import Control.Monad.Eff
+import Prelude (class Show, Unit, show, ($))
+import Graphics.Three.Math.Vector (Vector3)
+import Graphics.Three.Math.Euler (Euler)
+import Graphics.Three.Types (ThreeEff)
+import Graphics.Three.Util (ffi, fpi)
 
-import qualified Graphics.Three.Material as M
-import qualified Graphics.Three.Geometry as G
+import Graphics.Three.Material as M
+import Graphics.Three.Geometry as G
 
 foreign import data Mesh :: *
 foreign import data Line :: *
