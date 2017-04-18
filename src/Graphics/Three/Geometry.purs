@@ -4,7 +4,7 @@ import           Graphics.Three.Types (ThreeEff)
 import           Graphics.Three.Util (fpi, ffi)
 import           Graphics.Three.Math.Vector (Vector3)
 
-foreign import data Geometry :: *
+foreign import data Geometry :: Type
 
 create :: Array Vector3 -> ThreeEff Geometry
 create = ffi ["vertices", ""] 

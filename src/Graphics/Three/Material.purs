@@ -4,10 +4,10 @@ import Prelude (Unit)
 import Graphics.Three.Types (ThreeEff)
 import Graphics.Three.Util (ffi)
 
-foreign import data MeshBasic   :: *
-foreign import data LineBasic   :: *
-foreign import data LineDashed  :: *
-foreign import data Shader :: *
+foreign import data MeshBasic   :: Type
+foreign import data LineBasic   :: Type
+foreign import data LineDashed  :: Type
+foreign import data Shader :: Type
 
 
 class Material a

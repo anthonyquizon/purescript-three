@@ -6,8 +6,8 @@ import Graphics.Three.Util (fpi, ffi)
 import Graphics.Three.Math.Vector (Vector3)
 import Graphics.Three.Object3D (class Object3D)
 
-foreign import data OrthographicCamera :: *
-foreign import data PerspectiveCamera  :: *
+foreign import data OrthographicCamera :: Type
+foreign import data PerspectiveCamera  :: Type
 --TODO Combined camera
 
 

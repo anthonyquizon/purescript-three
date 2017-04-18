@@ -9,8 +9,8 @@ import Graphics.Three.Util (ffi, fpi)
 import Graphics.Three.Material as M
 import Graphics.Three.Geometry as G
 
-foreign import data Mesh :: *
-foreign import data Line :: *
+foreign import data Mesh :: Type
+foreign import data Line :: Type
 
 class Object3D a
 
@@ -56,6 +56,6 @@ rotateIncrement = fpi ["object", "x", "y", "z", ""]
 getGeometry :: forall a. (Renderable a) => a -> ThreeEff G.Geometry
 getGeometry = ffi ["object", ""] "object.geometry"
 
-getMaterial :: forall a b. (Renderable a, M.Material b) => a -> ThreeEff b
+getMaterial :: forall a b. Renderable a => M.Material b => a -> ThreeEff b
 getMaterial = ffi ["object", ""] "object.material"
 
