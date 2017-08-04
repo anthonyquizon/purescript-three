@@ -3,7 +3,7 @@ module Graphics.Three.Math.Euler where
 import Prelude (class Show)
 import Graphics.Three.Util (ffi)
 
-foreign import data Euler :: *
+foreign import data Euler :: Type
 
 --TODO order
 

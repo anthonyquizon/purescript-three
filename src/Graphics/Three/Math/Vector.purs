@@ -3,9 +3,9 @@ module Graphics.Three.Math.Vector where
 import Prelude (class Show)
 import Graphics.Three.Util (ffi)
 
-foreign import data Vector2 :: *
-foreign import data Vector3 :: *
-foreign import data Vector4 :: *
+foreign import data Vector2 :: Type
+foreign import data Vector3 :: Type
+foreign import data Vector4 :: Type
 
 -- TODO class Vector properties
     -- vector.x

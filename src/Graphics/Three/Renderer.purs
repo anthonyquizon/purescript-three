@@ -9,7 +9,7 @@ import           Graphics.Three.Scene (Scene)
 import           Graphics.Three.Types (Three, ThreeEff)
 import           Graphics.Three.Util (fpi, ffi)
 
-foreign import data Renderer :: *
+foreign import data Renderer :: Type
 
 createWebGL:: forall opts. {|opts} -> ThreeEff Renderer
 createWebGL = ffi ["params", ""] "new THREE.WebGLRenderer(params)"
