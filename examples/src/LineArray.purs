@@ -1,11 +1,9 @@
 module Examples.LineArray where
 
-import Prelude (Unit, ($), bind, (*), (/), pure, negate, (+), (-))
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE)
-import Control.Monad.Eff.Ref (REF, Ref, newRef, readRef, modifyRef)
+import Prelude (Unit, ($), bind, discard, (*), (/), pure, negate, (+), (-))
+import Effect (Effect)
+import Effect.Ref as Ref
 import Data.Array (foldM, (:))
-import DOM (DOM)
 import Graphics.Three.Camera      as Camera
 import Graphics.Three.Geometry    as Geometry
 import Graphics.Three.Material    as Material
@@ -13,7 +11,6 @@ import Graphics.Three.Renderer    as Renderer
 import Graphics.Three.Scene       as Scene
 import Graphics.Three.Object3D    as Object3D
 import Graphics.Three.Math.Vector (createVec3)
-import Graphics.Three.Types (Three)
 import Data.Int                   as Int
 import Math                       as Math
 
@@ -61,25 +58,22 @@ fragmentShader = """
 
 v3 = createVec3
 
-render :: forall eff. Ref StateRef ->
-                          Context ->
-                          Array Object3D.Line ->
-                          Eff (trace :: CONSOLE, ref :: REF, three :: Three | eff) Unit
+render :: Ref.Ref StateRef -> Context -> Array Object3D.Line -> Effect Unit
 render state context lines = do
-    modifyRef state $ \(StateRef s) -> stateRef (s.frame + 1.0) s.pos s.prev
-    s'@(StateRef s) <- readRef state
+    Ref.modify_ (\(StateRef s) -> stateRef (s.frame + 1.0) s.pos s.prev) state
+    s'@(StateRef s) <- Ref.read state
 
     renderContext context
 
 
-createLine :: forall a eff. (Material.Material a) => Dimensions -> 
-                                                    Scene.Scene -> 
-                                                    a -> 
-                                                    Number -> 
-                                                    Number -> 
-                                                    Array Object3D.Line ->
-                                                    Pos -> 
-                                                    Eff (three :: Three | eff) (Array Object3D.Line)
+createLine :: forall a. Material.Material a => Dimensions -> 
+                                               Scene.Scene -> 
+                                               a -> 
+                                               Number -> 
+                                               Number -> 
+                                               Array Object3D.Line ->
+                                               Pos -> 
+                                               Effect (Array Object3D.Line)
 createLine dims scene mat colWidth rowHeight acc (Pos p) = do
     let x =  (p.x + lineProps.padCol/2.0) - (dims.width/2.0)
         y = -(p.y + lineProps.padCol/2.0) + (dims.height/2.0)
@@ -95,7 +89,7 @@ createLine dims scene mat colWidth rowHeight acc (Pos p) = do
         w = colWidth  - lineProps.padCol
         h = rowHeight - lineProps.padRow
 
-createLineList :: forall a eff. (Material.Material a) => Scene.Scene -> a -> Eff (dom :: DOM, three :: Three | eff) (Array Object3D.Line)
+createLineList :: forall a. Material.Material a => Scene.Scene -> a -> Effect (Array Object3D.Line)
 createLineList scene mat = do
     canvas <- getElementsByTagName "canvas"
     dims   <- nodeDimensions canvas
@@ -108,10 +102,10 @@ createLineList scene mat = do
             
     foldM (createLine dims scene mat colWidth rowHeight) [] l
 
-main :: forall eff.Eff( trace :: CONSOLE, dom :: DOM, three :: Three, ref :: REF | eff) Unit
+main :: Effect Unit
 main = do
     ctx@(Context c) <- initContext Camera.Orthographic
-    state           <- newRef initStateRef
+    state           <- Ref.new initStateRef
     material        <- Material.createLineBasic { color: "red", linewidth: 10 }
 
     lineList <- createLineList c.scene material

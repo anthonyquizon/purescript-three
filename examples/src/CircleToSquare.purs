@@ -1,17 +1,13 @@
 module Examples.CircleToSquare where
 
-import Prelude
-import Control.Monad.Eff
-import Control.Monad.Eff.Console
-import Control.Monad.Eff.Ref
-import DOM
+import Prelude (Unit, bind, discard, max, pure, unit, ($), (*), (+), (/))
+import Effect (Effect)
+import Effect.Ref as Ref
 import Graphics.Three.Camera   as Camera
 import Graphics.Three.Material as Material
 import Graphics.Three.Object3D as Object3D
 import Graphics.Three.Geometry as Geometry
-import Graphics.Three.Renderer as Renderer
 import Graphics.Three.Scene    as Scene
-import Graphics.Three.Types
 import Math (min, sin, pi, (%))
 
 import Examples.Common
@@ -80,26 +76,26 @@ clamp n = min 1.0 $ max (0.0) n
 
 --TODO square wave with ease functions
 
-morphShape :: forall eff. Material.Shader -> Number -> Eff (trace :: CONSOLE, three :: Three | eff) Unit
+morphShape :: Material.Shader -> Number -> Effect Unit
 morphShape ma n = do
     let a = (sin $ ((2.0 * pi) / interval) * (n % interval)) * 0.5 + 0.5
     Material.setUniform ma "amount" $ clamp a
     pure unit
 
-render :: forall eff. Ref Number -> Context -> Material.Shader ->
-                       Eff ( trace :: CONSOLE, ref :: REF, three :: Three | eff) Unit
+render :: Ref.Ref Number -> Context -> Material.Shader -> Effect Unit
 render frame context mat = do
     
-    modifyRef frame $ \f -> f + 1.0
-    f <- readRef frame
+    Ref.modify_ (\f -> f + 1.0) frame
+    f <- Ref.read frame
 
     morphShape mat f
 
     renderContext context
 
+main :: Effect Unit
 main = do
     ctx@(Context c) <- initContext Camera.Orthographic
-    frame           <- newRef 0.0
+    frame           <- Ref.new 0.0
     material        <- Material.createShader {
                             uniforms: initUniforms
                             , vertexShader:   vertexShader
