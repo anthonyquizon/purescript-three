@@ -11,7 +11,10 @@
     "output"
   ],
   "dependencies": {
-    "purescript-console": "^2.0.0",
+    "purescript-console": "^4.0.0",
     "purescript-three": "../../purescript-three"
+  },
+  "resolutions": {
+    "purescript-prelude": "^4.0.0"
   }
 }
