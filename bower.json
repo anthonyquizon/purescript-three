@@ -20,7 +20,7 @@
     "tests"
   ],
   "dependencies": {
-    "threejs": "r82",
+    "threejs": "https://raw.githubusercontent.com/mrdoob/three.js/r97/build/three.min.js",
     "purescript-foreign": "~5.0.0",
     "purescript-web-dom": "^1.0.0",
     "purescript-easy-ffi": "~2.1.0",
